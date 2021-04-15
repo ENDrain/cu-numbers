@@ -1,38 +1,7 @@
-# ABOUT CHURCH SLAVONIC NUMBERS
-#
-# Church Slavonic (CS) script has individual digits to represent numbers from 1 to 9,
-# each round ten and each round hundred, for a total of 27 digits. There's no zero digit.
-#
-# A number x < 1000 in CS script is represented by a succession of 1 to 3 CS digits
-# that may contain a hundreds digit, a tens digit and a proper digit in that order.
-# Digits representing numbers 11-19 are swapped places, wheter or not a hundreds digit is present.
-# 
-# For the purpose of this program, this is to be referenced as "a hundred group".
-#
-# Examples:
-# а҃ = 1
-# і҃ = 10
-# р҃ = 100
-# ра҃і = 111 - note the digit swapping
-# рк҃а = 121
-#
-# A number x >= 1000 in CS script is prepended with a "thousand" sign.
-# For each "thousand" sign before a number, the number has to be mutiplied by a thousand.
-#
-# Altogether, a complete number in CS script consists of a succession of hundred groups
-# with "thousand" signs inbetween.
-#
-# Examples:
-# а҃ = 1
-# ҂а҃ = 1000
-# ҂҂а҃ = 1000000
-# ҂҂а҂аа҃ = 1001001
-#
-# There's also a "titlo" superscript sign that's obligatory to Church Slavonic numbers.
-# "Titlo" is placed in the number's rightmost hundred group;
-# above the 2nd-from-last digit if it exists, otherwise above the only digit.
-# See examples above.
-
+# For licensing information see LICENSE file included in the project's root directory.
+"""
+Module for number conversion between Church Slavonic and Arabic.
+"""
 
 import re
 
@@ -46,22 +15,22 @@ cu_null = "\uE000" # A placeholder character to represent zero in CU numbers
 cu_dict = cu_null + cu_digits + cu_null + cu_tens + cu_null + cu_hundreds
 
 
-# Process an arabic hundred group
-def _write_cu_hundred(hundred):
+def _write_cu_hundred(hundred = 0):
+    """Process an arabic hundred group."""
     return cu_dict[20 + hundred // 100] + cu_dict[10 + hundred % 100 // 10] + cu_dict[hundred % 10]
 
 
-# Process an arabic number in hundred groups
-def _write_cu_number(index, number, result):
+def _write_cu_number(number = 0, index = 0, result = ""):
+    """Process an arabic number per hundred group."""
     # @index arg counts the amount of hundred groups in a number
-    # to add the appropriate amount of the "҂" between each hundred group.
+    # to add the appropriate amount of "҂" before each hundred group.
 
     # Process leading hundred. Prepend with "҂" times @index if @index > 0
     sub_result = cu_thousand * index + _write_cu_hundred(number % 1000) + result
     
     if number // 1000:
         # If the number is still >1000: @index++, drop last 3 digits and repeat
-        return _write_cu_number(index + 1, number // 1000, sub_result) 
+        return _write_cu_number(number // 1000, index + 1, sub_result) 
 
     else:
         # Purge zero-groups and individual zeroes
@@ -77,7 +46,8 @@ def _write_cu_number(index, number, result):
         return sub_result   # And we're done
 
 
-def _read_cu_hundred(index, input):
+def _read_cu_hundred(input = "" , index = 0):
+    """Process a CU hundred group."""
     # @index arg holds current position of a hundred group in the number
 
     # Swap digits in numbers 11-19
@@ -102,9 +72,10 @@ def _read_cu_hundred(index, input):
     return subtotal
 
 
-# Process a Church Slavonic number
-def _read_cu_number(input):
-    sub_result = str.strip(input)
+def _read_cu_number(input = ""):
+    """Process a CU number per hundred group."""
+
+    sub_result = input
 
     # Strip ҃"҃ "
     sub_result = re.sub("[%s]" % cu_titlo, "", input)
@@ -118,6 +89,47 @@ def _read_cu_number(input):
 
     result = 0
     for i, k in enumerate(hundreds):
-        result += _read_cu_hundred(i, k[::-1])
+        result += _read_cu_hundred(k[::-1], i)
 
     return(result)
+
+
+def prepare(input):
+    """Prepare a CU number for conversion."""
+
+    input = str.lower(str.strip(input))         # Trim and lowercase
+    if re.fullmatch("([%s]*[%s]{1,4})+" % (cu_thousand, cu_digits + cu_tens + cu_hundreds + cu_titlo), input) == None:
+        raise ValueError("String does not match the pattern for Church Slavonic script number")
+    else:
+        return input
+
+
+
+def arab_to_cu(input):
+    """
+    Convert an Arabic number into Church Slavonic script.
+    
+    Requires a non-zero integer.
+    """
+
+    t = type(input)
+    if t != int:
+        raise TypeError("Non-zero integer required, got %s" % t)
+    elif input <= 0:
+        raise ValueError("Non-zero integer required")
+    else:
+        return _write_cu_number(input)    
+
+
+def cu_to_arab(input: str):
+    """
+    Convert a Church Slavonic script number into Arabic.
+
+    Requires a string.
+    """
+
+    t = type(input)
+    if t != str:
+        raise TypeError("String required, got %s" % t)
+    else:
+        return _read_cu_number(prepare(input))
