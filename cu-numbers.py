@@ -64,15 +64,15 @@ def _write_cu_number(index, number, result):
         return _write_cu_number(index + 1, number // 1000, sub_result) 
 
     else:
-        sub_result = sub_result.replace(cu_null, "")                # Strip zeroes
-        sub_result = re.sub("(%s+$)" % cu_thousand, "", sub_result) # Strip finishing thousand signs
+        # Purge zero-groups and individual zeroes
+        sub_result = re.sub("(%s*%s{3})|(%s){1}" % (cu_thousand, cu_null, cu_null), "", sub_result)
 
         # Calculate "titlo" position. Get leftmost hundred group
         end = re.search("([%s]?[%s]?[%s]?$)" % (cu_hundreds, cu_tens, cu_digits), sub_result).group(0)
         # If leftmost hundred group is 1 digit, append "titlo" at the end. Else, append at the 2nd-from-last position.
         sub_result = sub_result + cu_titlo if len(end) == 1 else sub_result[:-1] + cu_titlo + sub_result[-1:] 
 
-        sub_result = re.sub("(і)([%s])" % cu_digits, "\g<2>\g<1>", sub_result) # Swap digits in 11-19
+        sub_result = re.sub("(і)(%s)?([%s])" % (cu_titlo, cu_digits), "\g<3>\g<2>\g<1>", sub_result) # Swap digits in 11-19
 
         return sub_result   # And we're done
 
