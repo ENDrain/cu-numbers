@@ -1,8 +1,20 @@
-# ABOUT CHURCH SLAVONIC NUMBERS
+# NUMBERS IN CHURCH SLAVONIC SCRIPT
 
 ## 1. Numerals
 
 Church Slavonic script (*further CU*) has individual numerals to represent numbers from 1 to 9, each round ten and each round hundred, for a total of 27 numerals. There's no zero digit.
+
+CU | Arabic | CU | Arabic | CU | Arabic
+--- | --- | --- | --- | --- | ---
+а҃ | 1 | і҃ | 10 | р҃ | 100
+в҃ | 2 | к҃ | 20 | с҃ | 200
+г҃ | 3 | л҃ | 30 | т҃ | 300
+д҃ | 4 | м҃ | 40 | у҃ | 400
+є҃ | 5 | н҃ | 50 | ф҃ | 500
+ѕ҃ | 6 | ѯ҃ | 60 | х҃ | 600
+з҃ | 7 | ѻ҃ | 70 | ѱ҃ | 700
+и҃ | 8 | п҃ | 80 | ѡ҃ | 800
+ѳ҃ | 9 | ч҃ | 90 | ц҃ | 900
 
 ## 2. Basic numbers
 
@@ -20,7 +32,7 @@ CU | Arabic
 рк҃а | 121
 
 ## 3. Thousands
-A number `x >= 1000` in CU is prepended with a "thousand" sign. For each "thousand" sign before a number, the number has to be mutiplied by one thousand.
+A number `x >= 1000` in CU is prepended with one or more `҂` "thousand" signs. For each "thousand" sign before a number, the number has to be mutiplied by one thousand.
 
 ## 4. Number building
 
@@ -35,7 +47,7 @@ CU | Arabic
 ҂҂а҂аа҃ | 1001001
 
 ## 5. Decoration
-Finally, there is a "titlo" superscript sign that's obligatory to CU numbers. "Titlo" is placed in the number's rightmost hundred group; above the 2nd-from-last digit if it exists, otherwise above the only digit.
+Finally, there is a `҃` "titlo" superscript sign that's obligatory to CU numbers. "Titlo" is placed in the number's rightmost hundred group; above the 2nd-from-last digit if it exists, otherwise above the only digit.
     
 **Examples:**
 
