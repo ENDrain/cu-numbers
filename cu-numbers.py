@@ -36,7 +36,7 @@
 
 import re
 
-cu_digits = "авгдєзѕиѳ"
+cu_digits = "авгдєѕзиѳ"
 cu_tens = "іклмнѯѻпч"
 cu_hundreds = "рстуфхѱѡц"
 cu_thousand = "҂"
