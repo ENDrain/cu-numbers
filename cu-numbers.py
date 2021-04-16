@@ -67,18 +67,21 @@ def _write_cu_number(index, number, result):
         # Purge zero-groups and individual zeroes
         sub_result = re.sub("(%s*%s{3})|(%s){1}" % (cu_thousand, cu_null, cu_null), "", sub_result)
 
+        sub_result = re.sub("(?<!%s)(%s)([%s])" % (cu_thousand, cu_tens[0], cu_digits), "\g<2>\g<1>", sub_result) # Swap digits in 11-19
+
         # Calculate "titlo" position. Get leftmost hundred group
-        end = re.search("([%s]?[%s]?[%s]?$)" % (cu_hundreds, cu_tens, cu_digits), sub_result).group(0)
+        end = re.search("([%s]?(?:[%s]?[%s]?|[%s]?%s)$)" % (cu_hundreds, cu_tens[1:], cu_digits, cu_digits, cu_tens[0]), sub_result).group(0)
         # If leftmost hundred group is 1 digit, append "titlo" at the end. Else, append at the 2nd-from-last position.
         sub_result = sub_result + cu_titlo if len(end) == 1 else sub_result[:-1] + cu_titlo + sub_result[-1:] 
-
-        sub_result = re.sub("(і)(%s)?([%s])" % (cu_titlo, cu_digits), "\g<3>\g<2>\g<1>", sub_result) # Swap digits in 11-19
 
         return sub_result   # And we're done
 
 
 def _read_cu_hundred(index, input):
     # @index arg holds current position of a hundred group in the number
+
+    # Swap digits in numbers 11-19
+    input = re.sub("([%s])([%s])" % (cu_digits, cu_tens[0]), "\g<2>\g<1>", input)
 
     subtotal = multiplier = 0
     for k in input:
@@ -103,19 +106,17 @@ def _read_cu_hundred(index, input):
 def _read_cu_number(input):
     sub_result = str.strip(input)
 
-    # Strip ҃"҃ " and "҂"
-    sub_result = re.sub("[%s]" % cu_titlo, "", sub_result)
-    # Swap digits in numbers 11-19
-    sub_result = re.sub("([%s])([%s])" % (cu_digits, cu_dict[11]), "\g<2>\g<1>", sub_result)
+    # Strip ҃"҃ "
+    sub_result = re.sub("[%s]" % cu_titlo, "", input)
 
-    result = 0
     # Split number by hundred
     # It's important to split a number bottom-up, so that lower hundreds have lower indices
-    hundreds = re.split("([%s]?[%s]?[%s]?[%s]*)" % (cu_digits, cu_tens, cu_hundreds, cu_thousand), sub_result[::-1])
+    hundreds = re.split("((?:[%s]?[%s]?|%s[%s]?)[%s]?%s*)" % (cu_digits, cu_tens[1:], cu_tens[0], cu_digits, cu_hundreds, cu_thousand), sub_result[::-1])
 
     while hundreds.count(""): # Purge empty strs from the hundreds collection (it's a re.split() feature)
         hundreds.remove("")
 
+    result = 0
     for i, k in enumerate(hundreds):
         result += _read_cu_hundred(i, k[::-1])
 
