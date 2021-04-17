@@ -15,7 +15,6 @@ cu_null = "\uE000" # A placeholder character to represent zero in CU numbers
 cu_dict = "{0}{1}{0}{2}{0}{3}". format(cu_null, cu_digits, cu_tens, cu_hundreds)
 
 cu_group_regex = "({0}*[{1}]?(?:[{4}]?{3}|[{2}]?[{4}]?))". format(cu_thousand, cu_hundreds, cu_tens[1:],  cu_tens[0], cu_digits)
-print(cu_group_regex)
 
 
 def _to_cu_hundred(hundred = 0, group = 0):
@@ -93,9 +92,7 @@ def _to_arab_number(input = ""):
     hundreds = re.split("%s" % (cu_group_regex), sub_result)
     while hundreds.count(""): # Purge empty strs from the hundreds collection
         hundreds.remove("")
-    print(hundreds)
     hundreds.reverse()
-    print(hundreds)
 
     result = 0
     for i, k in enumerate(hundreds):
