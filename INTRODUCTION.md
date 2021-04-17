@@ -44,10 +44,10 @@ CU | Arabic
 а҃ | 1
 ҂а҃ | 1000
 ҂҂а҃ | 1000000
-҂҂а҂аа҃ | 1001001
+҂҂а҂а҃а | 1001001
 
 ## 5. Decoration
-Finally, there is a `҃` "titlo" superscript sign that's obligatory to CU numbers. "Titlo" is placed in the number's rightmost hundred group; above the 2nd-from-last digit if it exists, otherwise above the only digit.
+Finally, there is a `҃` "titlo" superscript sign that's obligatory to CU numbers. "Titlo" is placed above the 2nd-from-last digit if it exists and is not thousand-marked, otherwise above the last digit.
     
 **Examples:**
 

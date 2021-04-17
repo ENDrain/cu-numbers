@@ -38,10 +38,13 @@ def _write_cu_number(number = 0, index = 0, result = ""):
 
         sub_result = re.sub("(?<!%s)(%s)([%s])" % (cu_thousand, cu_tens[0], cu_digits), "\g<2>\g<1>", sub_result) # Swap digits in 11-19
 
-        # Calculate "titlo" position. Get leftmost hundred group
-        end = re.search("([%s]?(?:[%s]?[%s]?|[%s]?%s)$)" % (cu_hundreds, cu_tens[1:], cu_digits, cu_digits, cu_tens[0]), sub_result).group(0)
-        # If leftmost hundred group is 1 digit, append "titlo" at the end. Else, append at the 2nd-from-last position.
-        sub_result = sub_result + cu_titlo if len(end) == 1 else sub_result[:-1] + cu_titlo + sub_result[-1:] 
+        # Calculate "titlo" position
+
+        l = len(sub_result)
+        if l > 1 and sub_result[l - 2] != cu_thousand:
+            sub_result = sub_result[:l - 1] + cu_titlo + sub_result[l - 1:]
+        else:
+            sub_result += cu_titlo 
 
         return sub_result   # And we're done
 
