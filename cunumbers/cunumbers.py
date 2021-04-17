@@ -7,7 +7,7 @@ import re
 
 cu_digits = "авгдєѕзиѳ"
 cu_tens = "іклмнѯѻпч"
-cu_hundreds = "рстуфхѱѡц"
+cu_hundreds = "рстуфхѱѿц"
 cu_thousand = "҂"
 cu_titlo = "҃"
 
