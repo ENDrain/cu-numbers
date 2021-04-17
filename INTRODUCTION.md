@@ -13,7 +13,7 @@ CU | Arabic | CU | Arabic | CU | Arabic
 є҃ | 5 | н҃ | 50 | ф҃ | 500
 ѕ҃ | 6 | ѯ҃ | 60 | х҃ | 600
 з҃ | 7 | ѻ҃ | 70 | ѱ҃ | 700
-и҃ | 8 | п҃ | 80 | ѡ҃ | 800
+и҃ | 8 | п҃ | 80 | ѿ҃ | 800
 ѳ҃ | 9 | ч҃ | 90 | ц҃ | 900
 
 ## 2. Basic numbers
@@ -44,10 +44,10 @@ CU | Arabic
 а҃ | 1
 ҂а҃ | 1000
 ҂҂а҃ | 1000000
-҂҂а҂аа҃ | 1001001
+҂҂а҂а҃а | 1001001
 
 ## 5. Decoration
-Finally, there is a `҃` "titlo" superscript sign that's obligatory to CU numbers. "Titlo" is placed in the number's rightmost hundred group; above the 2nd-from-last digit if it exists, otherwise above the only digit.
+Finally, there is a `҃` "titlo" superscript sign that's obligatory to CU numbers. "Titlo" is placed above the 2nd-from-last digit if it exists and is not thousand-marked, otherwise above the last digit.
     
 **Examples:**
 

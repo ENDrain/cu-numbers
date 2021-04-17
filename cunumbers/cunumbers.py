@@ -7,46 +7,55 @@ import re
 
 cu_digits = "авгдєѕзиѳ"
 cu_tens = "іклмнѯѻпч"
-cu_hundreds = "рстуфхѱѡц"
+cu_hundreds = "рстуфхѱѿц"
 cu_thousand = "҂"
 cu_titlo = "҃"
 
 cu_null = "\uE000" # A placeholder character to represent zero in CU numbers
-cu_dict = cu_null + cu_digits + cu_null + cu_tens + cu_null + cu_hundreds
+cu_dict = "{0}{1}{0}{2}{0}{3}". format(cu_null, cu_digits, cu_tens, cu_hundreds)
+
+cu_group_regex = "({0}*[{1}]?(?:[{4}]?{3}|[{2}]?[{4}]?))". format(cu_thousand, cu_hundreds, cu_tens[1:],  cu_tens[0], cu_digits)
+print(cu_group_regex)
 
 
-def _write_cu_hundred(hundred = 0):
+def _to_cu_hundred(hundred = 0, group = 0):
     """Process an arabic hundred group."""
-    return cu_dict[20 + hundred // 100] + cu_dict[10 + hundred % 100 // 10] + cu_dict[hundred % 10]
+
+    if hundred:
+        return cu_thousand * group + cu_dict[20 + hundred // 100] + cu_dict[10 + hundred % 100 // 10] + cu_dict[hundred % 10]
+    else:
+        return ""
 
 
-def _write_cu_number(number = 0, index = 0, result = ""):
+def _to_cu_number(number = 0, group = 0, result = ""):
     """Process an arabic number per hundred group."""
-    # @index arg counts the amount of hundred groups in a number
-    # to add the appropriate amount of "҂" before each hundred group.
+    # @group is the current hundred group index
 
-    # Process leading hundred. Prepend with "҂" times @index if @index > 0
-    sub_result = cu_thousand * index + _write_cu_hundred(number % 1000) + result
+    # Process leading hundred
+    sub_result = _to_cu_hundred(number % 1000, group) + result
     
     if number // 1000:
-        # If the number is still >1000: @index++, drop last 3 digits and repeat
-        return _write_cu_number(number // 1000, index + 1, sub_result) 
+        # If the number is still >1000: @group++, drop last 3 digits and repeat
+        return _to_cu_number(number // 1000, group + 1, sub_result) 
 
     else:
-        # Purge zero-groups and individual zeroes
-        sub_result = re.sub("(%s*%s{3})|(%s){1}" % (cu_thousand, cu_null, cu_null), "", sub_result)
+        # Purge zeroes
+        sub_result = re.sub(cu_null, "", sub_result)
 
         sub_result = re.sub("(?<!%s)(%s)([%s])" % (cu_thousand, cu_tens[0], cu_digits), "\g<2>\g<1>", sub_result) # Swap digits in 11-19
 
-        # Calculate "titlo" position. Get leftmost hundred group
-        end = re.search("([%s]?(?:[%s]?[%s]?|[%s]?%s)$)" % (cu_hundreds, cu_tens[1:], cu_digits, cu_digits, cu_tens[0]), sub_result).group(0)
-        # If leftmost hundred group is 1 digit, append "titlo" at the end. Else, append at the 2nd-from-last position.
-        sub_result = sub_result + cu_titlo if len(end) == 1 else sub_result[:-1] + cu_titlo + sub_result[-1:] 
+        # Calculate "titlo" position
+
+        l = len(sub_result)
+        if l > 1 and sub_result[l - 2] != cu_thousand:
+            sub_result = sub_result[:l - 1] + cu_titlo + sub_result[l - 1:]
+        else:
+            sub_result += cu_titlo 
 
         return sub_result   # And we're done
 
 
-def _read_cu_hundred(input = "" , index = 0):
+def _to_arab_hundred(input = "" , index = 0):
     """Process a CU hundred group."""
     # @index arg holds current position of a hundred group in the number
 
@@ -72,7 +81,7 @@ def _read_cu_hundred(input = "" , index = 0):
     return subtotal
 
 
-def _read_cu_number(input = ""):
+def _to_arab_number(input = ""):
     """Process a CU number per hundred group."""
 
     sub_result = input
@@ -80,16 +89,17 @@ def _read_cu_number(input = ""):
     # Strip ҃"҃ "
     sub_result = re.sub("[%s]" % cu_titlo, "", input)
 
-    # Split number by hundred
-    # It's important to split a number bottom-up, so that lower hundreds have lower indices
-    hundreds = re.split("((?:[%s]?[%s]?|%s[%s]?)[%s]?%s*)" % (cu_digits, cu_tens[1:], cu_tens[0], cu_digits, cu_hundreds, cu_thousand), sub_result[::-1])
-
-    while hundreds.count(""): # Purge empty strs from the hundreds collection (it's a re.split() feature)
+    # Split number by hundred and reverse (so that lower groups have lower indices)
+    hundreds = re.split("%s" % (cu_group_regex), sub_result)
+    while hundreds.count(""): # Purge empty strs from the hundreds collection
         hundreds.remove("")
+    print(hundreds)
+    hundreds.reverse()
+    print(hundreds)
 
     result = 0
     for i, k in enumerate(hundreds):
-        result += _read_cu_hundred(k[::-1], i)
+        result += _to_arab_hundred(k, i)
 
     return(result)
 
@@ -105,7 +115,7 @@ def prepare(input):
 
 
 
-def arab_to_cu(input):
+def to_cu(input):
     """
     Convert an Arabic number into Church Slavonic script.
     
@@ -118,10 +128,10 @@ def arab_to_cu(input):
     elif input <= 0:
         raise ValueError("Non-zero integer required")
     else:
-        return _write_cu_number(input)    
+        return _to_cu_number(input)    
 
 
-def cu_to_arab(input: str):
+def to_arab(input):
     """
     Convert a Church Slavonic script number into Arabic.
 
@@ -132,4 +142,8 @@ def cu_to_arab(input: str):
     if t != str:
         raise TypeError("String required, got %s" % t)
     else:
-        return _read_cu_number(prepare(input))
+        return _to_arab_number(prepare(input))
+
+
+arab_to_cu = to_cu
+cu_to_arab = to_arab

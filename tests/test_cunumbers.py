@@ -19,12 +19,12 @@ class arab_to_cuTestCase(unittest.TestCase):
 
     def test_arab_to_cu_thousand(self):
         self.assertEqual(arab_to_cu(1000), "҂а҃")
-        self.assertEqual(arab_to_cu(1006), "҂аѕ҃")
+        self.assertEqual(arab_to_cu(1006), "҂а҃ѕ")
         self.assertEqual(arab_to_cu(1015), "҂ає҃і")
         self.assertEqual(arab_to_cu(1444), "҂аум҃д")
 
     def test_arab_to_cu_big(self):
-        self.assertEqual(arab_to_cu(10001010001), "҂҂҂і҂҂а҂іа҃")
+        self.assertEqual(arab_to_cu(10001010001), "҂҂҂і҂҂а҂і҃а")
         self.assertEqual(arab_to_cu(50000000000), "҂҂҂н҃")
         self.assertEqual(arab_to_cu(60000070000), "҂҂҂ѯ҂ѻ҃")
         
@@ -45,17 +45,17 @@ class cu_to_arabTestCase(unittest.TestCase):
 
     def test_cu_to_arab_thousands(self):
         self.assertEqual(1000, cu_to_arab("҂а҃"))
-        self.assertEqual(1006, cu_to_arab("҂аѕ҃"))
+        self.assertEqual(1006, cu_to_arab("҂а҃ѕ"))
         self.assertEqual(1015, cu_to_arab("҂ає҃і"))
         self.assertEqual(1444, cu_to_arab("҂аум҃д"))
 
     def test_cu_to_arab_big(self):
-        self.assertEqual(10001010001, cu_to_arab("҂҂҂і҂҂а҂іа҃"))
+        self.assertEqual(10001010001, cu_to_arab("҂҂҂і҂҂а҂і҃а"))
         self.assertEqual(50000000000, cu_to_arab("҂҂҂н҃"))
         self.assertEqual(60000070000, cu_to_arab("҂҂҂ѯ҂ѻ҃"))
 
     def test_cu_to_arab_no_tsnd(self):
-        self.assertEqual(80500690700, cu_to_arab("пфхчѱ҃"))
+        self.assertEqual(80500690700, cu_to_arab("пфхч҃ѱ"))
 
     def test_cu_to_arab_no_titlo(self):
         self.assertEqual(1, cu_to_arab("а"))

@@ -8,7 +8,7 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numbers.
 
 ## Requirements
 
-    Python >= 3.7
+    Python >= 3.5
 
 ## Installation
 
@@ -21,12 +21,12 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numbers.
     #   Convert an Arabic number to CU
     #   Requires non-zero int, returns str
 
-    a = cunumbers.arab_to_cu(1)
+    a = cunumbers.to_cu(1)
     
     #   Convert a CU number to an Arabic
     #   Requires str, returns int
 
-    b = cunumbers.cu_to_arab("а҃")
+    b = cunumbers.to_arab("а҃")
 
 ## Contributing
 
@@ -35,6 +35,10 @@ Create an issue describing a bug or suggestion, then create a pull request menti
 ## Feedback
 
 Drop me a line: amshoor@gmail.com
+
+## Changelog
+
+See [Changelog](./CHANGELOG.md).
 
 ## License
 
