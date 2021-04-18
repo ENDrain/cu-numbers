@@ -28,9 +28,9 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numeral system.
 
     b = cunumbers.to_arab("а҃")
 
-"Delimiter" and "plain" styles are supported. Arabic to CU conversion mode can be specified by supplying a flag. "Delimeter" style is by default.
+"Delimiter" and "plain" style numbers are supported in both directions. "Delimeter" style is default for CU-wise conversions.
 
-    #   Use CU_PLAIN or CU_DELIM to specify Arabic to CU coversion mode
+    #   Use CU_PLAIN flag to use "plain" style in CU-wise conversion
 
     c = cunumbers.to_cu(111111, CU_PLAIN)
     

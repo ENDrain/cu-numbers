@@ -82,7 +82,7 @@ def _to_cu_number_plain(input, registry = 0, result = "", *, flags):
         return sub_result
 
 
-def _to_cu_number(input, *, flags):
+def _to_cu_number(input, flags = 0):
     """Process an arabic number."""
 
     # Numbers up to 11000 are same in both styles, so never DELIM them
@@ -124,8 +124,8 @@ def _digits_to_arab(input, group = 0):
     return subtotal * pow(1000, max(multiplier, group))
 
 
-def _to_arab_number(input, *, flags):
-    """Process a CU number per hundred group."""
+def _to_arab_number(input, flags = 0):
+    """Process a CU number."""
 
     sub_result = input
     hundreds = []
@@ -150,7 +150,7 @@ def _to_arab_number(input, *, flags):
     return result
 
 
-def _prepare(input):
+def _prepare(input, flags = 0):
     """Prepare a CU number for conversion."""
     
     input = re.sub("[%s]" % _cu_titlo, "", input) # Strip ҃"҃ "
@@ -159,7 +159,7 @@ def _prepare(input):
     if re.fullmatch("%s+" % _cu_plain_regex, input):
         return _to_arab_number(input, flags = CU_PLAIN)
     elif re.fullmatch("%s+" % _cu_delim_regex, input):
-        return _to_arab_number(input, flags = CU_DELIM)
+        return _to_arab_number(input)
     else:
         raise ValueError("String does not match any pattern for Cyrillic numeral system number")
 
@@ -177,7 +177,7 @@ def to_cu(input, flags = 0):
         raise TypeError("Non-zero integer required, got %s" % t)
     elif input <= 0:
         raise ValueError("Non-zero integer required")
-    return _to_cu_number(input, flags = flags)    
+    return _to_cu_number(input, flags)    
 
 
 def to_arab(input, flags = 0):
