@@ -6,7 +6,6 @@ Module for number conversion between Arabic and Cyrillic numeral systems.
 
 import re
 
-CU_DELIM    = 0         # Deprecated 
 _CU_DELIM   = 0x1       # Write in delim style
 CU_PLAIN    = 0x10      # Read/write in plain style
 CU_NOTITLO  = 0x100     # DO NOT append titlo
