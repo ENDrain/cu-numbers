@@ -21,12 +21,12 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numbers.
     #   Convert an Arabic number to CU
     #   Requires non-zero int, returns str
 
-    a = cunumbers.to_cu(1)
+    a = cunumbers.arab_to_cu(1)
     
     #   Convert a CU number to an Arabic
     #   Requires str, returns int
 
-    b = cunumbers.to_arab("а҃")
+    b = cunumbers.cu_to_arab("а҃")
 
 ## Contributing
 
