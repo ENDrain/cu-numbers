@@ -1,10 +1,10 @@
 # cu-numbers
 
-A program for numbers conversion between Church Slavonic script (*further CU*) and Arabic numerals.
+A program for numbers conversion between Arabic and Cyrillic (*further CU*) numeral systems.
 
 ## Background
 
-See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
+See [Introduction](./INTRODUCTION.md) to learn about CU numeral system.
 
 ## Requirements
 
@@ -23,7 +23,7 @@ See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
 
     a = cunumbers.to_cu(1)
     
-    #   Convert a CU number to an Arabic
+    #   Convert a CU number to Arabic
     #   Requires str, returns int
 
     b = cunumbers.to_arab("а҃")

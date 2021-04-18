@@ -1,7 +1,7 @@
 # For licensing information see LICENSE file included in the project's root directory.
-# To learn about numbers in Church Slavonic script, see INTRODUCTION.md
+# To learn about Cyrillic numeral system (further CU), see INTRODUCTION.md
 """
-Module for number conversion between Church Slavonic script and Arabic.
+Module for number conversion between Arabic and Cyrillic numeral systems.
 """
 
 import re
@@ -104,7 +104,7 @@ def _to_cu_number(input, *, flags):
 
 
 def _digits_to_arab(input, group = 0):
-    """Process CU digits."""
+    """Process CU numerals."""
     # DELIM MODE: @group is current hundred group
 
     # Swap digits in numbers 11-19
@@ -161,13 +161,13 @@ def _prepare(input):
     elif re.fullmatch("%s+" % _cu_delim_regex, input):
         return _to_arab_number(input, flags = CU_DELIM)
     else:
-        raise ValueError("String does not match any pattern for Church Slavonic script number")
+        raise ValueError("String does not match any pattern for Cyrillic numeral system number")
 
 
 
 def to_cu(input, flags = 0):
     """
-    Convert an Arabic number into Church Slavonic script.
+    Convert a number into Cyrillic numeral system.
     
     Requires a non-zero integer.
     """
@@ -182,7 +182,7 @@ def to_cu(input, flags = 0):
 
 def to_arab(input, flags = 0):
     """
-    Convert a Church Slavonic script number into Arabic.
+    Convert a number into Arabic numeral system .
 
     Requires a non-empty string.
     """
