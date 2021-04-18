@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Added: Now supports reading/writing in "plain" style
+- Added: Flags to specify Arabic to CU conversion mode (default to "delimeter" style)
+- Added: Flag to omit "titlo"
+
 ## 1.1.1
 
 Cleanup

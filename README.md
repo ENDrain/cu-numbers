@@ -4,7 +4,7 @@ A program for numbers conversion between Church Slavonic script (*further CU*) a
 
 ## Background
 
-See [Introduction](./INTRODUCTION.md) to learn about CU numbers.
+See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
 
 ## Requirements
 
@@ -21,12 +21,23 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numbers.
     #   Convert an Arabic number to CU
     #   Requires non-zero int, returns str
 
-    a = cunumbers.arab_to_cu(1)
+    a = cunumbers.to_cu(1)
     
     #   Convert a CU number to an Arabic
     #   Requires str, returns int
 
-    b = cunumbers.cu_to_arab("а҃")
+    b = cunumbers.to_arab("а҃")
+
+"Delimiter" and "plain" styles are supported. Arabic to CU conversion mode can be specified by supplying a flag. "Delimeter" style is by default.
+
+    #   Use CU_PLAIN or CU_DELIM to specify Arabic to CU coversion mode
+
+    c = cunumbers.to_cu(111111, CU_PLAIN)
+    
+    #   Use CU_NOTITLO flag to omit "titlo"
+
+    d = cunumbers.to_cu(11000, CU_PLAIN + CU_NOTITLO)
+
 
 ## Contributing
 

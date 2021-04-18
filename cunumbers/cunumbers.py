@@ -1,118 +1,171 @@
 # For licensing information see LICENSE file included in the project's root directory.
+# To learn about numbers in Church Slavonic script, see INTRODUCTION.md
 """
-Module for number conversion between Church Slavonic and Arabic.
+Module for number conversion between Church Slavonic script and Arabic.
 """
 
 import re
 
-cu_digits = "авгдєѕзиѳ"
-cu_tens = "іклмнѯѻпч"
-cu_hundreds = "рстуфхѱѿц"
-cu_thousand = "҂"
-cu_titlo = "҃"
+CU_DELIM   = 0x1         # Read/write in delimeter style
+CU_PLAIN   = 0x10        # Read/write in plain style
+CU_NOTITLO = 0x100       # DO NOT append titlo
 
-cu_null = "\uE000" # A placeholder character to represent zero in CU numbers
-cu_dict = "{0}{1}{0}{2}{0}{3}". format(cu_null, cu_digits, cu_tens, cu_hundreds)
+_cu_digits = "авгдєѕзиѳ"
+_cu_tens = "іклмнѯѻпч"
+_cu_hundreds = "рстуфхѱѿц"
+_cu_thousand = "҂"
+_cu_titlo = "҃"
 
-cu_group_regex = "({0}*[{1}]?(?:[{4}]?{3}|[{2}]?[{4}]?))". format(cu_thousand, cu_hundreds, cu_tens[1:],  cu_tens[0], cu_digits)
+_cu_null = "\uE000" # A placeholder character to represent zero in CU numbers
+_cu_dict = "{0}{1}{0}{2}{0}{3}". format(_cu_null, _cu_digits, _cu_tens, _cu_hundreds)
+
+_cu_swap_regex = ["(%s)([%s])" % (_cu_tens[0], _cu_digits), "\g<2>\g<1>"]
+_cu_base_regex = "[{0}]?(?:[{2}]?{3}|[{1}]?[{2}]?)". format(_cu_hundreds, _cu_tens[1:], _cu_digits, _cu_tens[0])
+_cu_delim_regex = "(%s*%s)" % (_cu_thousand, _cu_base_regex)
+_cu_plain_regex = "(%s+[%s]{1}|(?:%s)$)" % (_cu_thousand, _cu_dict.replace(_cu_null, ""), _cu_base_regex)
 
 
-def _to_cu_hundred(hundred = 0, group = 0):
-    """Process an arabic hundred group."""
+def _chflag(flags, flag):
+    """Check a flag."""
+    return False if flags & flag == 0 else True
 
-    if hundred:
-        return cu_thousand * group + cu_dict[20 + hundred // 100] + cu_dict[10 + hundred % 100 // 10] + cu_dict[hundred % 10]
-    else:
+
+def _to_cu_digit(digit = 0, registry = 0, multiplier = 0):
+    """Process an arabic digit."""
+
+    if digit:
+        return _cu_thousand * multiplier + _cu_dict[10 * registry + digit]
+    else: # Skip if @digit = 0
         return ""
 
 
-def _to_cu_number(number = 0, group = 0, result = ""):
-    """Process an arabic number per hundred group."""
-    # @group is the current hundred group index
+def _to_cu_hundred(hundred = 0, group = 0, registry = 0, result = ""):
+    """Process an arabic hundred group.""" # DELIM MODE ONLY
 
-    # Process leading hundred
-    sub_result = _to_cu_hundred(number % 1000, group) + result
-    
-    if number // 1000:
-        # If the number is still >1000: @group++, drop last 3 digits and repeat
-        return _to_cu_number(number // 1000, group + 1, sub_result) 
-
-    else:
-        # Purge zeroes
-        sub_result = re.sub(cu_null, "", sub_result)
-
-        sub_result = re.sub("(?<!%s)(%s)([%s])" % (cu_thousand, cu_tens[0], cu_digits), "\g<2>\g<1>", sub_result) # Swap digits in 11-19
-
-        # Calculate "titlo" position
-
-        l = len(sub_result)
-        if l > 1 and sub_result[l - 2] != cu_thousand:
-            sub_result = sub_result[:l - 1] + cu_titlo + sub_result[l - 1:]
+    if hundred:
+        sub_result = _to_cu_digit(hundred % 10, registry) + result
+        if hundred // 10:
+            return _to_cu_hundred(hundred // 10, group, registry + 1, sub_result)
         else:
-            sub_result += cu_titlo 
+            # Swap digits in 11-19
+            sub_result = re.sub(_cu_swap_regex[0], _cu_swap_regex[1], sub_result)
+            return _cu_thousand * group + sub_result
+    else: # Skip if @hundred = 0
+        return ""
 
-        return sub_result   # And we're done
+
+def _to_cu_number_delim(input, group = 0, result = "", *, flags):
+    """Process an arabic number per hundred group."""
+    # @index is current hundred group
+
+    # print("DELIM MODE")
+    sub_result = _to_cu_hundred(input % 1000, group) + result # Process leading hundred group
+    if input // 1000:                                          
+        # Iterate over each hundred group, increasing @group index
+        return _to_cu_number_delim(input // 1000, group + 1, sub_result, flags = flags)
+    else:
+        return sub_result
 
 
-def _to_arab_hundred(input = "" , index = 0):
-    """Process a CU hundred group."""
-    # @index arg holds current position of a hundred group in the number
+def _to_cu_number_plain(input, registry = 0, result = "", *, flags):
+    """Process an arabic number per digit."""
+    # @index is current registry
+
+    # print("PLAIN MODE")
+    sub_result = _to_cu_digit(input % 10, registry % 3, registry // 3) + result # Process leading digit
+    if input // 10:
+        # Iterate over each digit, increasing @registry index
+        return _to_cu_number_plain(input // 10, registry + 1, sub_result, flags = flags)
+    else:
+        # Swap digits in 11-19 if "і" is not "҂"-marked
+        sub_result = re.sub("(?<!%s)%s" % (_cu_thousand, _cu_swap_regex[0]), _cu_swap_regex[1], sub_result)
+        return sub_result
+
+
+def _to_cu_number(input, *, flags):
+    """Process an arabic number."""
+
+    # Numbers up to 11000 are same in both styles, so never DELIM them
+    if input < 11000 or _chflag(flags, CU_PLAIN):
+        sub_result = _to_cu_number_plain(input, flags = flags)  
+    else:
+        sub_result = _to_cu_number_delim(input, flags = flags)
+          
+    if not _chflag(flags, CU_NOTITLO):
+        # Calculate "titlo" position
+        l = len(sub_result)
+        # If 2nd-from-last digit exists and not a "thousand" mark, place titlo next to it
+        if l > 1 and sub_result[l - 2] != _cu_thousand:
+            sub_result = sub_result[:l - 1] + _cu_titlo + sub_result[l - 1:]
+        else:
+            sub_result += _cu_titlo # Else, append to the end
+
+    return sub_result # And we're done
+
+
+def _digits_to_arab(input, group = 0):
+    """Process CU digits."""
+    # DELIM MODE: @group is current hundred group
 
     # Swap digits in numbers 11-19
-    input = re.sub("([%s])([%s])" % (cu_digits, cu_tens[0]), "\g<2>\g<1>", input)
+    input = re.sub(_cu_swap_regex[0], _cu_swap_regex[1], input)
 
     subtotal = multiplier = 0
     for k in input:
-        if k == cu_thousand:
-            # Set multiplier to the amount of leading "҂"
+        if k == _cu_thousand:
             multiplier += 1
             continue
+        index = _cu_dict.index(k) # Find current digit in dictionary
+        number = index % 10 # Digit
+        registry = index // 10 # Digit registry
+        subtotal += number * pow(10, registry) # Resulting number
 
-        _index = cu_dict.index(k)
-        number = _index % 10 # Digit
-        registry = _index // 10 # Digit registry
-        number = number * pow(10, registry) # Resulting number
-
-        subtotal += number # Add number up to the hundred subtotal
-    
-    # Raise hundred subtotal to the current registry, whether it's defined by the hunred @index or "҂" marks
-    subtotal *= pow(1000, max(multiplier, index))
-    return subtotal
+    # Multiply result by 1000 - times "҂" marks or current group
+    return subtotal * pow(1000, max(multiplier, group))
 
 
-def _to_arab_number(input = ""):
+def _to_arab_number(input, *, flags):
     """Process a CU number per hundred group."""
 
     sub_result = input
+    hundreds = []
 
-    # Strip ҃"҃ "
-    sub_result = re.sub("[%s]" % cu_titlo, "", input)
+    if _chflag(flags, CU_PLAIN):
+        hundreds = re.split("%s" % _cu_plain_regex, sub_result)
+    else:
+        hundreds = re.split("%s" % _cu_delim_regex, sub_result)
 
-    # Split number by hundred and reverse (so that lower groups have lower indices)
-    hundreds = re.split("%s" % (cu_group_regex), sub_result)
-    while hundreds.count(""): # Purge empty strs from the hundreds collection
+    while hundreds.count(""): # Purge empty strs from collection
         hundreds.remove("")
     hundreds.reverse()
 
     result = 0
-    for i, k in enumerate(hundreds):
-        result += _to_arab_hundred(k, i)
-
-    return(result)
-
-
-def prepare(input):
-    """Prepare a CU number for conversion."""
-
-    input = str.lower(str.strip(input))         # Trim and lowercase
-    if re.fullmatch("([%s]*[%s]{1,4})+" % (cu_thousand, cu_digits + cu_tens + cu_hundreds + cu_titlo), input) == None:
-        raise ValueError("String does not match the pattern for Church Slavonic script number")
+    if _chflag(flags, CU_PLAIN):
+        for k in hundreds:
+            result += _digits_to_arab(k)
     else:
-        return input
+        for i, k in enumerate(hundreds):
+            result += _digits_to_arab(k, i)
+
+    return result
+
+
+def _prepare(input):
+    """Prepare a CU number for conversion."""
+    
+    input = re.sub("[%s]" % _cu_titlo, "", input) # Strip ҃"҃ "
+    input = str.lower(str.strip(input)) # Trim and lowercase
+
+    if re.fullmatch("%s+" % _cu_plain_regex, input):
+        return _to_arab_number(input, flags = CU_PLAIN)
+    elif re.fullmatch("%s+" % _cu_delim_regex, input):
+        return _to_arab_number(input, flags = CU_DELIM)
+    else:
+        raise ValueError("String does not match any pattern for Church Slavonic script number")
 
 
 
-def to_cu(input):
+def to_cu(input, flags = 0):
     """
     Convert an Arabic number into Church Slavonic script.
     
@@ -124,23 +177,19 @@ def to_cu(input):
         raise TypeError("Non-zero integer required, got %s" % t)
     elif input <= 0:
         raise ValueError("Non-zero integer required")
-    else:
-        return _to_cu_number(input)    
+    return _to_cu_number(input, flags = flags)    
 
 
-def to_arab(input):
+def to_arab(input, flags = 0):
     """
     Convert a Church Slavonic script number into Arabic.
 
-    Requires a string.
+    Requires a non-empty string.
     """
 
     t = type(input)
     if t != str:
         raise TypeError("String required, got %s" % t)
-    else:
-        return _to_arab_number(prepare(input))
-
-
-arab_to_cu = to_cu
-cu_to_arab = to_arab
+    elif not input:
+        raise ValueError("Non-empty string required")
+    return _prepare(input)
