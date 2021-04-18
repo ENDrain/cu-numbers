@@ -57,6 +57,9 @@ class ToCUFlagsTestCase(unittest.TestCase):
 
     def test_to_cu_enddot(self):
         self.assertEqual(to_cu(1, CU_ENDDOT), "а҃.")
+
+    def test_to_cu_twodots(self):
+        self.assertEqual(to_cu(1, CU_TWODOTS), ".а҃.")
         
 class ToArabDelimTestCase(unittest.TestCase):
     def test_to_arab_digits(self):

@@ -6,10 +6,14 @@ Module for number conversion between Arabic and Cyrillic numeral systems.
 
 import re
 
-CU_DELIM   = 0x1    # Write in delim style
-CU_PLAIN   = 0x10   # Read/write in plain style
-CU_NOTITLO = 0x100  # DO NOT append titlo
-CU_ENDDOT  = 0x1000 # Append dot
+CU_DELIM   = 0x1       # Write in delim style
+CU_PLAIN   = 0x10      # Read/write in plain style
+CU_NOTITLO = 0x100     # DO NOT append titlo
+CU_ENDDOT  = 0x1000    # Append dot
+_CU_PREDOT = 0x10000   # Prepend dot
+#CU_DELDOT  = 0x100000 # Delimeter dots
+CU_TWODOTS = CU_ENDDOT + _CU_PREDOT              # Sandwich dots
+#CU_ALLDOTS = CU_ENDDOT + _CU_PREDOT + CU_DELDOT # Sandwich and delimeter dots
 
 _cu_digits = "авгдєѕзиѳ"
 _cu_tens = "іклмнѯѻпч"
@@ -103,8 +107,11 @@ def _to_cu_number(input, flags = 0):
 
     if _chflag(flags, CU_ENDDOT):
         sub_result += "."
+    
+    if _chflag(flags, _CU_PREDOT):
+        sub_result = "." + sub_result
 
-    return sub_result # And we're done
+    return sub_result
 
 
 def _digits_to_arab(input, group = 0):
