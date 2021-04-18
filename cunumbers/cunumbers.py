@@ -6,9 +6,10 @@ Module for number conversion between Arabic and Cyrillic numeral systems.
 
 import re
 
-CU_DELIM   = 0x1         # Read/write in delimeter style
-CU_PLAIN   = 0x10        # Read/write in plain style
-CU_NOTITLO = 0x100       # DO NOT append titlo
+CU_DELIM   = 0x1    # Write in delim style
+CU_PLAIN   = 0x10   # Read/write in plain style
+CU_NOTITLO = 0x100  # DO NOT append titlo
+CU_ENDDOT  = 0x1000 # Append dot
 
 _cu_digits = "авгдєѕзиѳ"
 _cu_tens = "іклмнѯѻпч"
@@ -100,6 +101,9 @@ def _to_cu_number(input, flags = 0):
         else:
             sub_result += _cu_titlo # Else, append to the end
 
+    if _chflag(flags, CU_ENDDOT):
+        sub_result += "."
+
     return sub_result # And we're done
 
 
@@ -153,7 +157,7 @@ def _to_arab_number(input, flags = 0):
 def _prepare(input, flags = 0):
     """Prepare a CU number for conversion."""
     
-    input = re.sub("[%s]" % _cu_titlo, "", input) # Strip ҃"҃ "
+    input = re.sub("[%s\.]" % _cu_titlo, "", input) # Strip ҃"҃ " and dots
     input = str.lower(str.strip(input)) # Trim and lowercase
 
     if re.fullmatch("%s+" % _cu_plain_regex, input):
@@ -162,7 +166,6 @@ def _prepare(input, flags = 0):
         return _to_arab_number(input)
     else:
         raise ValueError("String does not match any pattern for Cyrillic numeral system number")
-
 
 
 def to_cu(input, flags = 0):

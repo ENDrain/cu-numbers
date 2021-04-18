@@ -54,6 +54,9 @@ class ToCUFlagsTestCase(unittest.TestCase):
     def test_to_cu_notitlo(self):
         self.assertEqual(to_cu(1, CU_NOTITLO), "а")
         self.assertEqual(to_cu(11000, CU_PLAIN + CU_NOTITLO), "҂і҂а")
+
+    def test_to_cu_enddot(self):
+        self.assertEqual(to_cu(1, CU_ENDDOT), "а҃.")
         
 class ToArabDelimTestCase(unittest.TestCase):
     def test_to_arab_digits(self):
