@@ -6,12 +6,13 @@ Module for number conversion between Arabic and Cyrillic numeral systems.
 
 import re
 
-CU_DELIM   = 0x1       # Write in delim style
-CU_PLAIN   = 0x10      # Read/write in plain style
-CU_NOTITLO = 0x100     # DO NOT append titlo
-CU_ENDDOT  = 0x1000    # Append dot
-_CU_PREDOT = 0x10000   # Prepend dot
-#CU_DELDOT  = 0x100000 # Delimeter dots
+CU_DELIM   = 0        # Deprecated 
+_CU_DELIM  = 0x1      # Write in delim style
+CU_PLAIN   = 0x10     # Read/write in plain style
+CU_NOTITLO = 0x100    # DO NOT append titlo
+CU_ENDDOT  = 0x1000   # Append dot
+_CU_PREDOT = 0x10000  # Prepend dot
+CU_DELDOT  = 0x100001 # Delimeter dots (delim mode only)
 CU_TWODOTS = CU_ENDDOT + _CU_PREDOT              # Sandwich dots
 #CU_ALLDOTS = CU_ENDDOT + _CU_PREDOT + CU_DELDOT # Sandwich and delimeter dots
 
@@ -66,6 +67,8 @@ def _to_cu_number_delim(input, group = 0, result = "", *, flags):
     # print("DELIM MODE")
     sub_result = _to_cu_hundred(input % 1000, group) + result # Process leading hundred group
     if input // 1000:                                          
+        if _chflag(flags, CU_DELDOT):
+            sub_result = "." + sub_result
         # Iterate over each hundred group, increasing @group index
         return _to_cu_number_delim(input // 1000, group + 1, sub_result, flags = flags)
     else:
@@ -75,8 +78,7 @@ def _to_cu_number_delim(input, group = 0, result = "", *, flags):
 def _to_cu_number_plain(input, registry = 0, result = "", *, flags):
     """Process an arabic number per digit."""
     # @index is current registry
-
-    # print("PLAIN MODE")
+    
     sub_result = _to_cu_digit(input % 10, registry % 3, registry // 3) + result # Process leading digit
     if input // 10:
         # Iterate over each digit, increasing @registry index
@@ -90,8 +92,8 @@ def _to_cu_number_plain(input, registry = 0, result = "", *, flags):
 def _to_cu_number(input, flags = 0):
     """Process an arabic number."""
 
-    # Numbers up to 11000 are same in both styles, so never DELIM them
-    if input < 11000 or _chflag(flags, CU_PLAIN):
+    # Numbers up to 1000 are same in both styles, so never DELIM them
+    if input < 1001 or _chflag(flags, CU_PLAIN):
         sub_result = _to_cu_number_plain(input, flags = flags)  
     else:
         sub_result = _to_cu_number_delim(input, flags = flags)
@@ -99,8 +101,8 @@ def _to_cu_number(input, flags = 0):
     if not _chflag(flags, CU_NOTITLO):
         # Calculate "titlo" position
         l = len(sub_result)
-        # If 2nd-from-last digit exists and not a "thousand" mark, place titlo next to it
-        if l > 1 and sub_result[l - 2] != _cu_thousand:
+        # If 2nd-from-last symbol is a digit, place titlo next to it
+        if l > 1 and sub_result[l - 2] != _cu_thousand and sub_result[l - 2] != ".":
             sub_result = sub_result[:l - 1] + _cu_titlo + sub_result[l - 1:]
         else:
             sub_result += _cu_titlo # Else, append to the end
