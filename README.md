@@ -44,7 +44,6 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numeral system.
 	#   CU_DELIMDOT - add dot between each group in "delimeter" style.
 	#       Sets conversion to "delim" style.
 	#   CU_ALL_DOTS = combine CU_TWODOTS and CU_DELIMDOT
-	#   CU_GREEKDOT = use "greek" style (floating) dot
 
 
 ## Contributing

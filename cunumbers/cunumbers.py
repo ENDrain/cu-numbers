@@ -12,7 +12,6 @@ CU_NOTITLO = 0x100  # DO NOT append titlo
 CU_ENDDOT = 0x1000  # Append dot
 _CU_PREDOT = 0x10000  # Prepend dot
 CU_DELIMDOT = 0x100001  # Delimeter dots (delim mode only)
-CU_GREEKDOT = 0x1000000  # Greek-style dot
 CU_TWODOTS = CU_ENDDOT + _CU_PREDOT  # Sandwich dots
 CU_ALLDOTS = CU_ENDDOT + _CU_PREDOT + CU_DELIMDOT  # Sandwich and delimeter dots
 
@@ -21,8 +20,7 @@ _cu_tens = "іклмнѯѻпч"
 _cu_hundreds = "рстуфхѱѿц"
 _cu_thousand = "҂"
 _cu_titlo = "҃"
-_cu_dot = _cu_rudot = "."
-_cu_greekdot = "·"
+_cu_dot = "."
 
 _cu_null = "\uE000"  # A placeholder character to represent zero in CU numbers
 _cu_dict = "{0}{1}{0}{2}{0}{3}".format(_cu_null, _cu_digits, _cu_tens, _cu_hundreds)
@@ -108,14 +106,7 @@ def _to_cu_number_plain(input, registry=0, result="", *, flags):
 def _to_cu_number(input, flags=0):
     """Process an arabic number."""
 
-    if _chflag(flags, CU_ALLDOTS):
-        global _cu_dot
-        if _chflag(flags, CU_GREEKDOT):
-            _cu_dot = _cu_greekdot
-        else:
-            _cu_dot = _cu_rudot
-
-    # Numbers up to 1000 are same in all styles, never DELIM those
+    # Numbers up to 1000 are same in both styles, so never DELIM them
     if input < 1001 or _chflag(flags, CU_PLAIN):
         sub_result = _to_cu_number_plain(input, flags=flags)
     else:
@@ -134,7 +125,7 @@ def _to_cu_number(input, flags=0):
         sub_result += _cu_dot
 
     if _chflag(flags, _CU_PREDOT):
-        sub_result = _cu_dot + sub_result
+        sub_result = "." + sub_result
 
     return sub_result
 

@@ -63,10 +63,6 @@ class ToCUFlagsTestCase(unittest.TestCase):
     def test_to_cu_dotscustom(self):
         self.assertEqual(to_cu(1001, CU_ENDDOT + CU_DELIMDOT), "҂а.а҃.")
 
-    def test_to_cu_greekdot(self):
-        self.assertEqual(to_cu(1, CU_ENDDOT + CU_GREEKDOT), "а҃·")
-        self.assertEqual(to_cu(1, CU_ENDDOT), "а҃.")
-
 
 class ToArabDelimTestCase(unittest.TestCase):
     def test_to_arab_digits(self):
