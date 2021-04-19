@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+- Added: Flags to specify dotting style: end with dot, wrap in dots, use delimeter-dots, or any combination
+- Added: Obligatory dotting in ambiguous "delimeter" style cases
+
 ## 1.2.0
 
 - Added: Now supports reading/writing in "plain" style

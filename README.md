@@ -1,42 +1,49 @@
 # cu-numbers
 
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cu-numbers) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/cu-numbers) ![Codecov](https://img.shields.io/codecov/c/github/endrain/cu-numbers)
+
+[![PyPI - License](https://img.shields.io/pypi/l/cu-numbers)](./LICENSE)
+
 A program for numbers conversion between Arabic and Cyrillic (*further CU*) numeral systems.
 
 ## Background
 
 See [Introduction](./INTRODUCTION.md) to learn about CU numeral system.
 
-## Requirements
-
-    Python >= 3.5
-
 ## Installation
 
-    pip install cu-numbers
+	pip install cu-numbers
 
 ## Usage
 
-    import cunumbers
+	import cunumbers
 
-    #   Convert an Arabic number to CU
-    #   Requires non-zero int, returns str
+	#   Convert an Arabic number to CU
+	#   Requires non-zero int, returns str
 
-    a = cunumbers.to_cu(1)
-    
-    #   Convert a CU number to Arabic
-    #   Requires str, returns int
+	a = cunumbers.to_cu(1)
+	
+	#   Convert a CU number to Arabic
+	#   Requires str, returns int
 
-    b = cunumbers.to_arab("а҃")
+	b = cunumbers.to_arab("а҃")
 
-"Delimiter" and "plain" styles are supported. Arabic to CU conversion mode can be specified by supplying a flag. "Delimeter" style is by default.
+"Delimiter" and "plain" style numbers are supported in both directions. "Delimeter" style is default for CU-wise conversions.
 
-    #   Use CU_PLAIN or CU_DELIM to specify Arabic to CU coversion mode
+	#   Use CU_PLAIN flag to use "plain" style in CU-wise conversion
 
-    c = cunumbers.to_cu(111111, CU_PLAIN)
-    
-    #   Use CU_NOTITLO flag to omit "titlo"
+	c = cunumbers.to_cu(111111, CU_PLAIN)
+	
+	#   Use CU_NOTITLO flag to omit "titlo"
 
-    d = cunumbers.to_cu(11000, CU_PLAIN + CU_NOTITLO)
+	d = cunumbers.to_cu(11000, CU_PLAIN + CU_NOTITLO)
+
+	#   Use following flags in CU-wise conversion to add dot-styling:
+	#   CU_ENDDOT - append dot at the end
+	#   CU_WRAPDOT - append dot at both ends
+	#   CU_DELIMDOT - add dot between each group in "delimeter" style.
+	#       Sets conversion to "delim" style.
+	#   CU_ALLDOT = combine CU_WRAPDOT and CU_DELIMDOT
 
 
 ## Contributing
@@ -50,7 +57,3 @@ Drop me a line: amshoor@gmail.com
 ## Changelog
 
 See [Changelog](./CHANGELOG.md).
-
-## License
-
-See [LICENSE](./LICENSE).
