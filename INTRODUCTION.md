@@ -72,9 +72,8 @@ CU|Arabic
 ## 5. Decoration
 The `҃`&nbsp; "titlo" superscript sign is obligatory to CU numbers. "Titlo" is placed above the 2nd-from-last digit if it exists and is not thousand-marked, otherwise above the last digit.
 	
-CU numbers may be decorated with dots. A dot may be appended at the end or at both sides of a number. Also dot can be used as an additional delimeter in "delim" style. In some cases it is necessary to do so to distinguish between some shit.
+CU numbers may be decorated with dots. A dot may be appended at the end or at both sides of a number. Also dots may be used as additional delimeters. It is necessary to do so in some cases to avoid ambiguity:
 
-**Examples:**
 CU|Arabic
 ---|---
 ҂а҃і|11000

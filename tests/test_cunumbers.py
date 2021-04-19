@@ -1,11 +1,12 @@
 import unittest
 from cunumbers import *
 
+
 class ToCUPlainTestCase(unittest.TestCase):
     def test_to_cu_digits(self):
         self.assertEqual(to_cu(1), "а҃")
         self.assertEqual(to_cu(9), "ѳ҃")
-    
+
     def test_to_cu_tens(self):
         self.assertEqual(to_cu(10), "і҃")
         self.assertEqual(to_cu(18), "и҃і")
@@ -29,9 +30,9 @@ class ToCUPlainTestCase(unittest.TestCase):
         self.assertEqual(to_cu(60000070000, CU_PLAIN), "҂҂҂ѯ҂ѻ҃")
         self.assertEqual(to_cu(111111111, CU_PLAIN), "҂҂р҂҂і҂҂а҂р҂і҂ара҃і")
 
-class ToCUDelimTestCase(unittest.TestCase):
 
-    def test_to_cu__delim_thousand(self):
+class ToCUDelimTestCase(unittest.TestCase):
+    def test_to_cu_delim_thousand(self):
         self.assertEqual(to_cu(11000), "҂а҃і")
 
     def test_to_cu_delim_big(self):
@@ -39,6 +40,7 @@ class ToCUDelimTestCase(unittest.TestCase):
         self.assertEqual(to_cu(50000000000), "҂҂҂н҃")
         self.assertEqual(to_cu(60000070000), "҂҂҂ѯ҂ѻ҃")
         self.assertEqual(to_cu(111111111), "҂҂раі҂раіра҃і")
+
 
 class ToCUFlagsTestCase(unittest.TestCase):
     def test_to_cu_notitlo(self):
@@ -65,7 +67,7 @@ class ToCUFlagsTestCase(unittest.TestCase):
         self.assertEqual(to_cu(1, CU_ENDDOT + CU_GREEKDOT), "а҃·")
         self.assertEqual(to_cu(1, CU_ENDDOT), "а҃.")
 
-        
+
 class ToArabDelimTestCase(unittest.TestCase):
     def test_to_arab_digits(self):
         self.assertEqual(1, to_arab("а҃"))
@@ -100,17 +102,19 @@ class ToArabDelimTestCase(unittest.TestCase):
 
     def test_to_arab_spaced(self):
         self.assertEqual(1, to_arab("а҃ "))
-    
+
     def test_to_arab_uppercase(self):
         self.assertEqual(1, to_arab("А҃"))
 
     def test_to_arab_mixed(self):
         self.assertEqual(2021, to_arab(" вКА"))
 
+
 class ToArabPlainTestCase(unittest.TestCase):
     def test_to_arab_plain_big(self):
         self.assertEqual(11000, to_arab("҂і҂а"))
         self.assertEqual(111111111, to_arab("҂҂р҂҂і҂҂а҂р҂і҂ара҃і"))
+
 
 class ErrorTestCase(unittest.TestCase):
     def test_to_cu_error(self):
@@ -124,5 +128,6 @@ class ErrorTestCase(unittest.TestCase):
         self.assertRaises(ValueError, to_arab, "")
         self.assertRaises(ValueError, to_arab, "A113")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
