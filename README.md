@@ -1,5 +1,9 @@
 # cu-numbers
 
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cu-numbers) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/cu-numbers) ![Codecov](https://img.shields.io/codecov/c/github/endrain/cu-numbers)
+
+[![PyPI - License](https://img.shields.io/pypi/l/cu-numbers)](./LICENSE)
+
 A program for numbers conversion between Arabic and Cyrillic (*further CU*) numeral systems.
 
 ## Background
@@ -57,7 +61,3 @@ Drop me a line: amshoor@gmail.com
 ## Changelog
 
 See [Changelog](./CHANGELOG.md).
-
-## License
-
-See [LICENSE](./LICENSE).
