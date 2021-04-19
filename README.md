@@ -2,7 +2,7 @@
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cu-numbers) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/cu-numbers) [![Codecov](https://img.shields.io/codecov/c/github/endrain/cu-numbers)](https://app.codecov.io/gh/endrain/cu-numbers)
 
-[![PyPI - License](https://img.shields.io/pypi/l/cu-numbers)](./LICENSE)
+[![PyPI - License](https://img.shields.io/pypi/l/cu-numbers)](./LICENSE) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 A program for numbers conversion between Arabic and Cyrillic (*further CU*) numeral systems.
 
