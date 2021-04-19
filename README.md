@@ -1,6 +1,6 @@
 # cu-numbers
 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cu-numbers) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/cu-numbers) ![Codecov](https://img.shields.io/codecov/c/github/endrain/cu-numbers)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cu-numbers) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/cu-numbers) [![Codecov](https://img.shields.io/codecov/c/github/endrain/cu-numbers)](https://app.codecov.io/gh/endrain/cu-numbers)
 
 [![PyPI - License](https://img.shields.io/pypi/l/cu-numbers)](./LICENSE)
 
