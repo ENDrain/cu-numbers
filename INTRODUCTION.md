@@ -65,13 +65,17 @@ CU|Arabic
 In "circled" style, a special set of encircling markers is used to denote each higher order of magnitude from ten thousands up to billions.
 
 **Examples:**
-CU|ARABIC
+CU|Arabic
 ---|---
 а&#1160; а&#8413; ҂ара҃і|111 111
 
 ## 5. Decoration
-Finally, there is a `҃`&nbsp; "titlo" superscript sign that's obligatory to CU numbers. "Titlo" is placed above the 2nd-from-last digit if it exists and is not thousand-marked, otherwise above the last digit.
-    
-**Examples:**
+The `҃`&nbsp; "titlo" superscript sign is obligatory to CU numbers. "Titlo" is placed above the 2nd-from-last digit if it exists and is not thousand-marked, otherwise above the last digit.
+	
+CU numbers may be decorated with dots. A dot may be appended at the end or at both sides of a number. Also dot can be used as an additional delimeter in "delim" style. In some cases it is necessary to do so to distinguish between some shit.
 
-See examples above. **NB:** in some (many) fonts "titlo" appears to follow after a digit, not above it.
+**Examples:**
+CU|Arabic
+---|---
+҂а҃і|11000
+҂а.і҃|1010
