@@ -19,7 +19,8 @@ class ToCUPlainTestCase(unittest.TestCase):
 
     def test_to_cu_thousand(self):
         self.assertEqual(to_cu(1000), "҂а҃")
-        self.assertEqual(to_cu(1006), "҂а҃ѕ")
+        self.assertEqual(to_cu(1006, CU_PLAIN), "҂а҃ѕ")
+        self.assertEqual(to_cu(1010, CU_PLAIN), "҂а҃і")
         self.assertEqual(to_cu(1015), "҂ає҃і")
         self.assertEqual(to_cu(1444), "҂аум҃д")
         self.assertEqual(to_cu(11000, CU_PLAIN), "҂і҂а҃")
@@ -33,6 +34,7 @@ class ToCUPlainTestCase(unittest.TestCase):
 
 class ToCUDelimTestCase(unittest.TestCase):
     def test_to_cu_delim_thousand(self):
+        self.assertEqual(to_cu(1010), "҂а.і҃")
         self.assertEqual(to_cu(11000), "҂а҃і")
 
     def test_to_cu_delim_big(self):
@@ -55,6 +57,8 @@ class ToCUFlagsTestCase(unittest.TestCase):
 
     def test_to_cu_delimdot(self):
         self.assertEqual(to_cu(1001, CU_DELIMDOT), "҂а.а҃")
+        self.assertEqual(to_cu(1010, CU_DELIMDOT), "҂а.і҃")
+        self.assertEqual(to_cu(11000, CU_DELIMDOT), "҂а҃і")
         self.assertEqual(to_cu(111111111, CU_DELIMDOT), "҂҂раі.҂раі.ра҃і")
 
     def test_to_cu_alldots(self):

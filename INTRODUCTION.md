@@ -74,7 +74,8 @@ The `҃`&nbsp; "titlo" superscript sign is obligatory to CU numbers. "Titlo" is 
 	
 CU numbers may be decorated with dots. A dot may be appended at the end or at both sides of a number. Also dots may be used as additional delimeters. It is necessary to do so in some cases to avoid ambiguity:
 
-CU|Arabic
----|---
-҂а҃і|11000
-҂а.і҃|1010
+||CU|Arabic
+|---|---|---
+|"Plain" style:|҂і҂а҃|11000
+|"Delim" style:|҂а҃і|11000
+||҂а.і҃|1010

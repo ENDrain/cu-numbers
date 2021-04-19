@@ -61,7 +61,8 @@ def _to_cu_hundred(hundred=0, group=0, registry=0, result=""):
         else:
             # Swap digits in 11-19
             sub_result = re.sub(_cu_swap_regex[0], _cu_swap_regex[1], sub_result)
-            return _cu_thousand * group + sub_result
+            # Use dot delimeters by default to prevent ambiguity
+            return _cu_dot + _cu_thousand * group + sub_result
     else:  # Skip if @hundred = 0
         return ""
 
@@ -73,13 +74,21 @@ def _to_cu_number_delim(input, group=0, result="", *, flags):
     # print("DELIM MODE")
     sub_result = (
         _to_cu_hundred(input % 1000, group) + result
-    )  # Process leading hundred group
+    )  # Process rightmost hundred group
     if input // 1000:
-        if _chflag(flags, CU_DELIMDOT):
-            sub_result = _cu_dot + sub_result
         # Iterate over each hundred group, increasing @group index
         return _to_cu_number_delim(input // 1000, group + 1, sub_result, flags=flags)
     else:
+        # Drop all dots that aren't making difference unless CU_DELIMDOT
+        if not _chflag(flags, CU_DELIMDOT):
+            # print("Dropping leftover delim dots")
+            sub_result = re.sub(
+                "(\{0}(?!{1}$)|(?<!{2}[{3}])\{0}(?={1}$))".format(
+                    _cu_dot, _cu_tens[0], _cu_thousand, _cu_digits
+                ),
+                "",
+                sub_result,
+            )
         return sub_result
 
 
@@ -89,7 +98,7 @@ def _to_cu_number_plain(input, registry=0, result="", *, flags):
 
     sub_result = (
         _to_cu_digit(input % 10, registry % 3, registry // 3) + result
-    )  # Process leading digit
+    )  # Process rightmost digit
     if input // 10:
         # Iterate over each digit, increasing @registry index
         return _to_cu_number_plain(input // 10, registry + 1, sub_result, flags=flags)
@@ -116,16 +125,19 @@ def _to_cu_number(input, flags=0):
         # Calculate "titlo" position
         l = len(sub_result)
         # If 2nd-from-last symbol is a digit, place titlo next to it
-        if l > 1 and sub_result[l - 2] != _cu_thousand and sub_result[l - 2] != _cu_dot:
+        if l > 1 and not re.match(
+            "[\S]*[%s\%s][\S]$" % (_cu_thousand, _cu_dot), sub_result
+        ):
             sub_result = sub_result[: l - 1] + _cu_titlo + sub_result[l - 1 :]
         else:
             sub_result += _cu_titlo  # Else, append to the end
 
-    if _chflag(flags, CU_ENDDOT):
-        sub_result += _cu_dot
-
-    if _chflag(flags, _CU_PREDOT):
-        sub_result = "." + sub_result
+    if _chflag(flags, CU_ENDDOT):  # Append dot unless it's already there
+        sub_result = re.sub("[\s\S]*[^\.]$", "\g<0>.", sub_result)
+    if _chflag(flags, _CU_PREDOT):  # Prepend dot unless it's already there
+        sub_result = re.sub("^[^\.][\s\S]*", ".\g<0>", sub_result)
+    else:  # Remove leftover leftmost dot from CU_DELIMDOT
+        sub_result = re.sub("^\.([\s\S]*)", "\g<1>", sub_result)
 
     return sub_result
 
