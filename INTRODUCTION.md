@@ -1,7 +1,7 @@
 # CYRILLIC NUMERAL SYSTEM
 
 ## 1. Numerals
-Church numeral system (*further CU*) has individual letters assigned to represent numbers from 1 to 9 in registries from digits to hundreds, for a total of 27 numerals. There's no zero numeral.
+Cyrillic numeral system (*further CU*) has individual letters assigned to represent numbers from 1 to 9 in registries from digits to hundreds, for a total of 27 numerals. There's no zero numeral.
 
 CU|Arabic|CU|Arabic|CU|Arabic
 ---|---|---|---|---|---
