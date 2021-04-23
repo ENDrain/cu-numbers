@@ -1,209 +1,269 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included in the project's root directory.
 # To learn about Cyrillic numeral system (further CU), see INTRODUCTION.md
-"""
-Module for number conversion between Arabic and Cyrillic numeral systems.
-"""
+"Module for number conversion between Arabic and Cyrillic numeral systems."
 
 import re
 
-_CU_DELIM = 0x1  # Write in delim style
+CU_DELIM = 0x1  # Write in delim style
 CU_PLAIN = 0x10  # Read/write in plain style
 CU_NOTITLO = 0x100  # DO NOT append titlo
 CU_ENDDOT = 0x1000  # Append dot
-_CU_PREDOT = 0x10000  # Prepend dot
-CU_DELIMDOT = 0x100001  # Delimeter dots (delim mode only)
-CU_WRAPDOT = CU_ENDDOT + _CU_PREDOT  # Wrap in dots
-CU_ALLDOT = CU_ENDDOT + _CU_PREDOT + CU_DELIMDOT  # Sandwich and delimeter dots
+CU_PREDOT = 0x10000  # Prepend dot
+CU_DELIMDOT = 0x100000 | CU_DELIM  # Delimeter dots (delim mode only)
+CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots
+CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots
 
-_cu_digits = "авгдєѕзиѳ"
-_cu_tens = "іклмнѯѻпч"
-_cu_hundreds = "рстуфхѱѿц"
-_cu_thousand = "҂"
-_cu_titlo = "҃"
-_cu_dot = "."
+cu_digits = "авгдєѕзиѳ"  # CU digit numerals
+cu_tens = "іклмнѯѻпч"  # CU tens numerals
+cu_hundreds = "рстуфхѱѿц"  # CU hundreds numerals
+cu_thousand = "҂"  # "Thousand" mark
+cu_titlo = "҃"  # "Titlo" decorator
+cu_dot = "."  # Dot decorator
 
-_cu_null = "\uE000"  # A placeholder character to represent zero in CU numbers
-_cu_dict = "{0}{1}{0}{2}{0}{3}".format(_cu_null, _cu_digits, _cu_tens, _cu_hundreds)
-
-_cu_swap_regex = ["(%s)([%s])" % (_cu_tens[0], _cu_digits), "\g<2>\g<1>"]
-_cu_base_regex = "[{0}]?(?:[{2}]?{3}|[{1}]?[{2}]?)".format(
-    _cu_hundreds, _cu_tens[1:], _cu_digits, _cu_tens[0]
-)
-_cu_delim_regex = "(%s*%s)" % (_cu_thousand, _cu_base_regex)
-_cu_plain_regex = "(%s+[%s]{1}|(?:%s)$)" % (
-    _cu_thousand,
-    _cu_dict.replace(_cu_null, ""),
-    _cu_base_regex,
+cu_null = "\uE000"  # A placeholder character to represent zero in CU numbers
+cu_dict = "{0}{1}{0}{2}{0}{3}".format(  # CU numerals dictionary
+    cu_null, cu_digits, cu_tens, cu_hundreds
 )
 
-
-def _chflag(flags, flag):
-    """Check a flag."""
-    return False if flags & flag == 0 else True
-
-
-def _to_cu_digit(digit=0, registry=0, multiplier=0):
-    """Process an arabic digit."""
-
-    if digit:
-        return _cu_thousand * multiplier + _cu_dict[10 * registry + digit]
-    else:  # Skip if @digit = 0
-        return ""
-
-
-def _to_cu_hundred(hundred=0, group=0, registry=0, result=""):
-    """Process an arabic hundred group."""  # DELIM MODE ONLY
-
-    if hundred:
-        sub_result = _to_cu_digit(hundred % 10, registry) + result
-        if hundred // 10:
-            return _to_cu_hundred(hundred // 10, group, registry + 1, sub_result)
-        else:
-            # Swap digits in 11-19
-            sub_result = re.sub(_cu_swap_regex[0], _cu_swap_regex[1], sub_result)
-            # Use dot delimeters by default to prevent ambiguity
-            return _cu_dot + _cu_thousand * group + sub_result
-    else:  # Skip if @hundred = 0
-        return ""
+cu_group_regex = (  # Regex for a basic CU number x < 1000
+    "[{0}]?(?:[{2}]?{3}|[{1}]?[{2}]?)".format(
+        cu_hundreds, cu_tens[1:], cu_digits, cu_tens[0]
+    )
+)
+cu_delim_regex = "({0}*{1})".format(  # Regex for a digit group in "delim" style
+    cu_thousand, cu_group_regex
+)
+cu_plain_regex = (  # Regex for a single digit in "plain" style
+    "({0}+[{1}]{2}|(?:{3})$)".format(
+        cu_thousand,
+        cu_dict.replace(cu_null, ""),
+        "{1}",
+        cu_group_regex,
+    )
+)
 
 
-def _to_cu_number_delim(input, group=0, result="", flags=0):
-    """Process an arabic number per hundred group."""
-    # @index is current hundred group
+class CUNumber:
+    def __init__(self, input, flags=0):
+        self.cu = None
+        self.arabic = input
+        self.flags = flags
 
-    # print("DELIM MODE")
-    sub_result = (
-        _to_cu_hundred(input % 1000, group) + result
-    )  # Process rightmost hundred group
-    if input // 1000:
-        # Iterate over each hundred group, increasing @group index
-        return _to_cu_number_delim(input // 1000, group + 1, sub_result, flags)
-    else:
-        # Drop all dots that aren't making difference unless CU_DELIMDOT
-        if not _chflag(flags, CU_DELIMDOT):
-            # print("Dropping leftover delim dots")
-            sub_result = re.sub(
+    def get(self):
+        return self.cu
+
+    def hasFlag(self, flag):
+        """Check a flag."""
+
+        return False if self.flags & flag == 0 else True
+
+    def stripDelimDots(self):
+        "Strip delimeter dots unless CU_DELIMDOT is set."
+
+        if not self.hasFlag(CU_DELIMDOT):
+            self.cu = re.sub(
                 "(\{0}(?!{1}$)|(?<!{2}[{3}])\{0}(?={1}$))".format(
-                    _cu_dot, _cu_tens[0], _cu_thousand, _cu_digits
+                    cu_dot, cu_tens[0], cu_thousand, cu_digits
                 ),
                 "",
-                sub_result,
+                self.cu,
             )
-        return sub_result
+        return self
 
+    def stripAheadDot(self):
+        "Strip ahead dot."
 
-def _to_cu_number_plain(input, registry=0, result="", flags=0):
-    """Process an arabic number per digit."""
-    # @index is current registry
+        self.cu = re.sub("^\.([\S]*)", "\g<1>", self.cu)
+        return self
 
-    sub_result = (
-        _to_cu_digit(input % 10, registry % 3, registry // 3) + result
-    )  # Process rightmost digit
-    if input // 10:
-        # Iterate over each digit, increasing @registry index
-        return _to_cu_number_plain(input // 10, registry + 1, sub_result, flags)
-    else:
-        # Swap digits in 11-19 if "і" is not "҂"-marked
-        sub_result = re.sub(
-            "(?<!%s)%s" % (_cu_thousand, _cu_swap_regex[0]),
-            _cu_swap_regex[1],
-            sub_result,
-        )
-        return sub_result
+    def prependDot(self):
+        "Prepend dot if CU_PREDOT is set."
 
-
-def _to_cu_number(input, flags=0):
-    """Process an arabic number."""
-
-    # Numbers up to 1000 are same in both styles, so never DELIM them
-    if input < 1001 or _chflag(flags, CU_PLAIN):
-        sub_result = _to_cu_number_plain(input, flags=flags)
-    else:
-        sub_result = _to_cu_number_delim(input, flags=flags)
-
-    if not _chflag(flags, CU_NOTITLO):
-        # Calculate "titlo" position
-        l = len(sub_result)
-        # If 2nd-from-last symbol is a digit, place titlo next to it
-        if l > 1 and not re.match(
-            "[\S]*[%s\%s][\S]$" % (_cu_thousand, _cu_dot), sub_result
-        ):
-            sub_result = sub_result[: l - 1] + _cu_titlo + sub_result[l - 1 :]
+        if self.hasFlag(CU_PREDOT):
+            self.cu = re.sub("^[^\.][\S]*", ".\g<0>", self.cu)
+            return self
         else:
-            sub_result += _cu_titlo  # Else, append to the end
+            return self.stripAheadDot()
 
-    if _chflag(flags, CU_ENDDOT):  # Append dot unless it's already there
-        sub_result = re.sub("[\s\S]*[^\.]$", "\g<0>.", sub_result)
-    if _chflag(flags, _CU_PREDOT):  # Prepend dot unless it's already there
-        sub_result = re.sub("^[^\.][\s\S]*", ".\g<0>", sub_result)
-    else:  # Remove leftover leftmost dot from CU_DELIMDOT
-        sub_result = re.sub("^\.([\s\S]*)", "\g<1>", sub_result)
+    def appendDot(self):
+        "Append dot if CU_ENDDOT is set."
 
-    return sub_result
+        if self.hasFlag(CU_ENDDOT):
+            self.cu = re.sub("[\S]*[^\.]$", "\g<0>.", self.cu)
+        return self
+
+    def appendTitlo(self):
+        """Append "titlo" unless CU_NOTITLO is set."""
+
+        if not self.hasFlag(CU_NOTITLO):
+            result = re.subn(
+                "([\S]+)(?<![{0}\{1}])([\S])$".format(cu_thousand, cu_dot),
+                "\g<1>{0}\g<2>".format(cu_titlo),
+                self.cu,
+            )
+            self.cu = result[0] if result[1] > 0 else self.cu + cu_titlo
+        return self
+
+    def swapDigits(input):
+        """Swap digits in 11-19 unless "і" is "thousand"-marked."""
+
+        result = re.sub(
+            "(?<!{0})({1})([{2}])".format(cu_thousand, cu_tens[0], cu_digits),
+            "\g<2>\g<1>",
+            input,
+        )
+        return result
+
+    def processDigit(input, registry=0, multiplier=0):
+        "Convert the Arabic digit to a CU numeral."
+
+        return (
+            cu_thousand * multiplier + cu_dict[10 * registry + input] if input else ""
+        )
+
+    def _processNumberPlain(input, registry=0, result=""):
+        "Process the Arabic number per digit."
+        # @registry is current registry
+
+        if input:
+            result = (
+                CUNumber.processDigit(input % 10, registry % 3, registry // 3) + result
+            )
+            return CUNumber._processNumberPlain(input // 10, registry + 1, result)
+        else:
+            return CUNumber.swapDigits(result)
+
+    def processGroup(input, group=0):
+        "Process the group of 3 Arabic digits."
+
+        input = input % 1000
+        return (
+            (cu_dot + cu_thousand * group + CUNumber._processNumberPlain(input))
+            if input
+            else ""
+        )
+
+    def _processNumberDelim(input, group=0, result=""):
+        "Process the Arabic number per groups of 3 digits."
+        # @index is current group of digits number (i.e. amount of multiplications of thousand)
+
+        if input:
+            result = CUNumber.processGroup(input, group) + result
+            return CUNumber._processNumberDelim(input // 1000, group + 1, result)
+        else:
+            return result
+
+    def processNumberPlain(self):
+
+        self.cu = CUNumber._processNumberPlain(self.arabic)
+        return self
+
+    def processNumberDelim(self):
+
+        self.cu = CUNumber._processNumberDelim(self.arabic)
+        return self
+
+    def convert(self):
+        "Convert the Arabic number to CU."
+
+        if self.arabic <= 0:
+            return self
+        elif self.arabic < 1001 or self.hasFlag(CU_PLAIN):
+            self.processNumberPlain()
+        else:
+            self.processNumberDelim()
+        return self.stripDelimDots().prependDot().appendDot().appendTitlo()
 
 
-def _digits_to_arab(input, group=0):
-    """Process CU numerals."""
-    # DELIM MODE: @group is current hundred group
+class ArabicNumber:
+    def __init__(self, input):
+        self.cu = input
+        self.arabic = None
+        self.prepare()
 
-    # Swap digits in numbers 11-19
-    input = re.sub(_cu_swap_regex[0], _cu_swap_regex[1], input)
+    def get(self):
+        return self.arabic
 
-    subtotal = multiplier = 0
-    for k in input:
-        if k == _cu_thousand:
-            multiplier += 1
-            continue
-        index = _cu_dict.index(k)  # Find current digit in dictionary
+    def prepare(self):
+        "Prepare the CU number for conversion."
+
+        self.cu = re.sub(
+            "[{0}\.]".format(cu_titlo), "", self.cu
+        )  # Strip ҃"҃ " and dots
+        self.cu = str.strip(self.cu)
+        self.cu = str.lower(self.cu)
+
+    def processDigit(input, registry=0):
+        "Convert the CU numeral to an arabic digit."
+        print(input)
+        index = cu_dict.index(input)  # Find current digit in dictionary
         number = index % 10  # Digit
         registry = index // 10  # Digit registry
-        subtotal += number * pow(10, registry)  # Resulting number
+        return number * pow(10, registry)  # Resulting number
 
-    # Multiply result by 1000 - times "҂" marks or current group
-    return subtotal * pow(1000, max(multiplier, group))
+    def processGroup(input, group=0):
+        "Process the group of CU numerals."
 
+        subtotal = multiplier = 0
+        for k in input:
+            if k == cu_thousand:
+                multiplier += 1
+                continue
+            subtotal += ArabicNumber.processDigit(k)
 
-def _to_arab_number(input, flags=0):
-    """Process a CU number."""
+        # Multiply result by 1000 - times "҂" marks or current group
+        return subtotal * pow(1000, max(multiplier, group))
 
-    sub_result = input
-    hundreds = []
+    def prepareGroups(input, regex):
+        "Prepare CU digit groups for conversion."
 
-    if _chflag(flags, CU_PLAIN):
-        hundreds = re.split("%s" % _cu_plain_regex, sub_result)
-    else:
-        hundreds = re.split("%s" % _cu_delim_regex, sub_result)
+        groups = re.split(regex, input)
 
-    while hundreds.count(""):  # Purge empty strs from collection
-        hundreds.remove("")
-    hundreds.reverse()
+        while groups.count(""):  # Purge empty strs from collection
+            groups.remove("")
+        groups.reverse()
+        return groups
 
-    result = 0
-    if _chflag(flags, CU_PLAIN):
-        for k in hundreds:
-            result += _digits_to_arab(k)
-    else:
-        for i, k in enumerate(hundreds):
-            result += _digits_to_arab(k, i)
+    def _processNumberPlain(input):
+        "Process the CU number per digit."
 
-    return result
+        groups = ArabicNumber.prepareGroups(input, cu_plain_regex)
 
+        result = 0
+        for k in groups:
+            result += ArabicNumber.processGroup(k)
+        return result
 
-def _prepare(input, flags=0):
-    """Prepare a CU number for conversion."""
+    def _processNumberDelim(input):
+        "Process the CU number per groups of 1-3 digits."
 
-    input = re.sub("[%s\.]" % _cu_titlo, "", input)  # Strip ҃"҃ " and dots
-    input = str.lower(str.strip(input))  # Trim and lowercase
+        groups = ArabicNumber.prepareGroups(input, cu_delim_regex)
 
-    if re.fullmatch("%s+" % _cu_plain_regex, input):
-        return _to_arab_number(input, flags=CU_PLAIN)
-    elif re.fullmatch("%s+" % _cu_delim_regex, input):
-        return _to_arab_number(input)
-    else:
-        raise ValueError(
-            "String does not match any pattern for Cyrillic numeral system number"
-        )
+        result = 0
+        for i, k in enumerate(groups):
+            result += ArabicNumber.processGroup(k, i)
+        return result
+
+    def processNumberPlain(self):
+        self.arabic = ArabicNumber._processNumberPlain(self.cu)
+        return self
+
+    def processNumberDelim(self):
+        self.arabic = ArabicNumber._processNumberDelim(self.cu)
+        return self
+
+    def convert(self):
+        "Choose the CU number to Arabic."
+
+        if not self.cu:
+            return self
+        if re.fullmatch("{0}+".format(cu_plain_regex), self.cu):
+            return self.processNumberPlain()
+        elif re.fullmatch("{0}+".format(cu_delim_regex), self.cu):
+            return self.processNumberDelim()
+        else:
+            return self
 
 
 def to_cu(input, flags=0):
@@ -213,12 +273,9 @@ def to_cu(input, flags=0):
     Requires a non-zero integer.
     """
 
-    t = type(input)
-    if t != int:
-        raise TypeError("Non-zero integer required, got %s" % t)
-    elif input <= 0:
-        raise ValueError("Non-zero integer required")
-    return _to_cu_number(input, flags)
+    if isinstance(input, int):
+        return CUNumber(input, flags).convert().get()
+    return None
 
 
 def to_arab(input, flags=0):
@@ -228,9 +285,6 @@ def to_arab(input, flags=0):
     Requires a non-empty string.
     """
 
-    t = type(input)
-    if t != str:
-        raise TypeError("String required, got %s" % t)
-    elif not input:
-        raise ValueError("Non-empty string required")
-    return _prepare(input)
+    if isinstance(input, str):
+        return ArabicNumber(input).convert().get()
+    return None

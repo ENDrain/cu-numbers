@@ -24,26 +24,28 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numeral system.
 	a = cunumbers.to_cu(1)
 	
 	#   Convert a CU number to Arabic
-	#   Requires str, returns int
+	#   Requires non-empty str, returns int
 
 	b = cunumbers.to_arab("а҃")
 
-"Delimiter" and "plain" style numbers are supported in both directions. "Delimeter" style is default for CU-wise conversions.
+"Delimiter" and "plain" style numbers are supported in both directions. "Delimeter" style is default for CU-wise conversion.
 
-	#   Use CU_PLAIN flag to use "plain" style in CU-wise conversion
+Several falgs can be used with `to_cu()` method:
+
+	#   CU_PLAIN flag sets conversion to "plain" style
 
 	c = cunumbers.to_cu(111111, CU_PLAIN)
 	
-	#   Use CU_NOTITLO flag to omit "titlo"
+	#   CU_NOTITLO flag omits "titlo" output
 
-	d = cunumbers.to_cu(11000, CU_PLAIN + CU_NOTITLO)
+	d = cunumbers.to_cu(11000, CU_PLAIN | CU_NOTITLO)
 
-	#   Use following flags in CU-wise conversion to add dot-styling:
+	#   Following flags control dot styling:
+	#
 	#   CU_ENDDOT - append dot at the end
 	#   CU_WRAPDOT - append dot at both ends
-	#   CU_DELIMDOT - add dot between each group in "delimeter" style.
-	#       Sets conversion to "delim" style.
-	#   CU_ALLDOT = combine CU_WRAPDOT and CU_DELIMDOT
+	#   CU_DELIMDOT - add dot separator between digit groups. Sets conversion to "delim" style
+	#   CU_ALLDOT - combine CU_WRAPDOT and CU_DELIMDOT
 
 
 ## Contributing

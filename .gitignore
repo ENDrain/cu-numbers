@@ -131,6 +131,7 @@ dmypy.json
 
 # VSCode
 .vscode/
+*.code-workspace
 
 # Pre-commit
 .pre-commit-config.yaml
