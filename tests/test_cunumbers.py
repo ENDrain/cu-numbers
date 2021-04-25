@@ -118,16 +118,16 @@ class ToArabPlainTestCase(unittest.TestCase):
 
 
 class ErrorTestCase(unittest.TestCase):
-    def testToCUError(self):
-        self.assertEqual(None, to_cu("String"))
-        self.assertEqual(None, to_cu(9.75))
-        self.assertEqual(None, to_cu(0))
-        self.assertEqual(None, to_cu(-69))
+    def test_to_cu_error(self):
+        self.assertRaises(TypeError, to_cu, "String")
+        self.assertRaises(TypeError, to_cu, 9.75)
+        self.assertRaises(ValueError, to_cu, 0)
+        self.assertRaises(ValueError, to_cu, -69)
 
-    def testToArabError(self):
-        self.assertEqual(None, to_arab(420))
-        self.assertEqual(None, to_arab(""))
-        self.assertEqual(None, to_arab("A113"))
+    def test_to_arab_error(self):
+        self.assertRaises(TypeError, to_arab, 420)
+        self.assertRaises(ValueError, to_arab, "")
+        self.assertRaises(ValueError, to_arab, "A113")
 
 
 if __name__ == "__main__":
