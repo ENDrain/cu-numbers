@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included in the project's root directory.
-# To learn about Cyrillic numeral system (further CU), see INTRODUCTION.md
+# To learn about Cyrillic numeral system (CU), see INTRODUCTION.md
 "Module for number conversion between Arabic and Cyrillic numeral systems."
 
 import re
@@ -21,7 +21,7 @@ cu_thousand = "҂"  # "Thousand" mark
 cu_titlo = "҃"  # "Titlo" decorator
 cu_dot = "."  # Dot decorator
 
-cu_null = "\uE000"  # A placeholder character to represent zero in CU numbers
+cu_null = "\uE000"  # Placeholder character to represent zero in CU numbers
 cu_dict = "{0}{1}{0}{2}{0}{3}".format(  # CU numerals dictionary
     cu_null, cu_digits, cu_tens, cu_hundreds
 )
@@ -46,12 +46,17 @@ cu_plain_regex = (  # Regex for a single digit in "plain" style
 
 class CUNumber:
     def __init__(self, input, flags=0):
-        self.cu = None
+        self.cu = ""
         self.arabic = input
         self.flags = flags
+        self.prepare()
 
     def get(self):
         return self.cu
+
+    def prepare(self):
+        if self.arabic <= 0:
+            raise ValueError("Non-zero integer required")
 
     def hasFlag(self, flag):
         """Check a flag."""
@@ -116,7 +121,7 @@ class CUNumber:
         return result
 
     def processDigit(input, registry=0, multiplier=0):
-        "Convert the Arabic digit to a CU numeral."
+        "Convert the Arabic digit to a Cyrillic numeral."
 
         return (
             cu_thousand * multiplier + cu_dict[10 * registry + input] if input else ""
@@ -165,11 +170,9 @@ class CUNumber:
         return self
 
     def convert(self):
-        "Convert the Arabic number to CU."
+        "Convert the Arabic number to Cyrillic."
 
-        if self.arabic <= 0:
-            return self
-        elif self.arabic < 1001 or self.hasFlag(CU_PLAIN):
+        if self.arabic < 1001 or self.hasFlag(CU_PLAIN):
             self.processNumberPlain()
         else:
             self.processNumberDelim()
@@ -179,31 +182,34 @@ class CUNumber:
 class ArabicNumber:
     def __init__(self, input):
         self.cu = input
-        self.arabic = None
+        self.arabic = 0
         self.prepare()
 
     def get(self):
         return self.arabic
 
     def prepare(self):
-        "Prepare the CU number for conversion."
+        "Prepare the Cyrillic number for conversion."
 
-        self.cu = re.sub(
-            "[{0}\.]".format(cu_titlo), "", self.cu
-        )  # Strip ҃"҃ " and dots
-        self.cu = str.strip(self.cu)
-        self.cu = str.lower(self.cu)
+        if self.cu:
+            self.cu = re.sub(
+                "[{0}\.]".format(cu_titlo), "", self.cu
+            )  # Strip ҃"҃ " and dots
+            self.cu = str.strip(self.cu)
+            self.cu = str.lower(self.cu)
+        else:
+            raise ValueError("Non-empty string required")
 
     def processDigit(input, registry=0):
-        "Convert the CU numeral to an arabic digit."
-        print(input)
+        "Convert the Cyrillic numeral to an arabic digit."
+
         index = cu_dict.index(input)  # Find current digit in dictionary
         number = index % 10  # Digit
         registry = index // 10  # Digit registry
         return number * pow(10, registry)  # Resulting number
 
     def processGroup(input, group=0):
-        "Process the group of CU numerals."
+        "Process the group of Cyrillic numerals."
 
         subtotal = multiplier = 0
         for k in input:
@@ -216,7 +222,7 @@ class ArabicNumber:
         return subtotal * pow(1000, max(multiplier, group))
 
     def prepareGroups(input, regex):
-        "Prepare CU digit groups for conversion."
+        "Prepare Cyrillic numeral groups for conversion."
 
         groups = re.split(regex, input)
 
@@ -226,7 +232,7 @@ class ArabicNumber:
         return groups
 
     def _processNumberPlain(input):
-        "Process the CU number per digit."
+        "Process the Cyrillic number per digit."
 
         groups = ArabicNumber.prepareGroups(input, cu_plain_regex)
 
@@ -236,7 +242,7 @@ class ArabicNumber:
         return result
 
     def _processNumberDelim(input):
-        "Process the CU number per groups of 1-3 digits."
+        "Process the Cyrillic number per groups of 1-3 digits."
 
         groups = ArabicNumber.prepareGroups(input, cu_delim_regex)
 
@@ -254,16 +260,24 @@ class ArabicNumber:
         return self
 
     def convert(self):
-        "Choose the CU number to Arabic."
+        "Choose the Cyrillic number to Arabic."
 
-        if not self.cu:
-            return self
         if re.fullmatch("{0}+".format(cu_plain_regex), self.cu):
             return self.processNumberPlain()
         elif re.fullmatch("{0}+".format(cu_delim_regex), self.cu):
             return self.processNumberDelim()
         else:
-            return self
+            raise ValueError(
+                "String does not match any pattern for Cyrillic numeral system number"
+            )
+
+
+def isinstance(input, condition, msg):
+    t = type(input)
+    if t == condition:
+        return True
+    else:
+        raise TypeError(msg.format(t))
 
 
 def to_cu(input, flags=0):
@@ -273,9 +287,8 @@ def to_cu(input, flags=0):
     Requires a non-zero integer.
     """
 
-    if isinstance(input, int):
+    if isinstance(input, int, "Non-zero integer required, got {0}"):
         return CUNumber(input, flags).convert().get()
-    return None
 
 
 def to_arab(input, flags=0):
@@ -285,6 +298,5 @@ def to_arab(input, flags=0):
     Requires a non-empty string.
     """
 
-    if isinstance(input, str):
+    if isinstance(input, str, "Non-empty string required, got {0}"):
         return ArabicNumber(input).convert().get()
-    return None

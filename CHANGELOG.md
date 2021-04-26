@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.2
+
+- Added: Exceptions on unexpected input
+
 ## 1.3.1
 
 - Optimization
