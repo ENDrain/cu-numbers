@@ -38,8 +38,8 @@ Cyrillic|Arabic
 ҂р҃|100 000
 ҂҂а҃|1 000 000
 
-## 4. Number building: multiple styles
-There are multiple styles of building Cyrillic numbers with values `x > 999`.
+## 4. Number building: various styles
+There are various styles of building Cyrillic numbers with values `x > 999`.
 
 ## 4.1. "Plain" style
 In "plain" style, "thousand" signs are prepended to each numeral in higher registries, so that only the numeral following is multiplied.
@@ -49,12 +49,12 @@ In this style, numerals representing numbers 11-19 are only swapped unless "thou
 ***Examples:**
 Cyrillic|Arabic
 ---|---
-҂р҂і҂а҂ра҃і|111 111
+҂р҂і҂ара҃і|111 111
 
 ## 4.2 "Delimeter" style
 In "delimeter" style, "thousand" signs are prepended to each group of numerals that form a basic number, so that the whole basic number following is multiplied.
 
-Unlike in "plain", in this style numerals representing numbers 11-19 are swapped on each ocCyrillicrence.
+Unlike in "plain", in this style numerals representing numbers 11-19 are swapped on each occurrence.
 
 **Examples:**
 Cyrillic|Arabic
@@ -78,7 +78,7 @@ Historically, "titlo" could've been placed above the 2nd digit, or above the who
 
 ## 5.2 Dots
 	
-Cyrillic numbers may be decorated with dots. A dot may be appended at the end or at both sides of a number. Also dots may be used as additional delimeters. It is necessary to do so in some cases to avoid ambiguity:
+Cyrillic numbers may be decorated with dots. A dot may be appended at the end or at both sides of a number. Dots also may be used as additional delimeters. It is necessary to do so in some cases to avoid ambiguity:
 
 ||Cyrillic|Arabic
 |---|---|---
