@@ -1,5 +1,7 @@
 # Changelog
 
+🌏 English [Русский](./CHANGELOG.ru.md)
+
 ## 1.3.2
 
 - Added: Exceptions on unexpected input
@@ -27,7 +29,7 @@
 
 - Added: Now supports Python >= 3.5
 - Fixed: Wrong "titlo" positioning
-- Fixed: Wrong 800 digit
+- Fixed: Wrong "800" digit
 
 
 ## 1.0.0

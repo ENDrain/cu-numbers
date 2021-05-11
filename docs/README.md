@@ -4,6 +4,8 @@
 
 [![PyPI - License](https://img.shields.io/pypi/l/cu-numbers)](./LICENSE) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+🌏 English [Русский](./README.ru.md)
+
 A program for numbers conversion between Arabic and Cyrillic (*further CU*) numeral systems.
 
 ## Background
@@ -16,17 +18,17 @@ See [Introduction](./INTRODUCTION.md) to learn about CU numeral system.
 
 ## Usage
 
-	import cunumbers
+	import cunumbers.cunumbers as cu
 
 	#   Convert an Arabic number to CU
 	#   Requires non-zero int, returns str
 
-	a = cunumbers.to_cu(1)
+	a = cu.to_cu(1)
 	
 	#   Convert a CU number to Arabic
 	#   Requires non-empty str, returns int
 
-	b = cunumbers.to_arab("а҃")
+	b = cu.to_arab("а҃")
 
 "Delimiter" and "plain" style numbers are supported in both directions. "Delimeter" style is default for CU-wise conversion.
 
@@ -34,11 +36,11 @@ Several falgs can be used with `to_cu()` method:
 
 	#   CU_PLAIN flag sets conversion to "plain" style
 
-	c = cunumbers.to_cu(111111, CU_PLAIN)
+	c = cu.to_cu(111111, CU_PLAIN)
 	
 	#   CU_NOTITLO flag omits "titlo" output
 
-	d = cunumbers.to_cu(11000, CU_PLAIN | CU_NOTITLO)
+	d = cu.to_cu(11000, CU_PLAIN | CU_NOTITLO)
 
 	#   Following flags control dot styling:
 	#

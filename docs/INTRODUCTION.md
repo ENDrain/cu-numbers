@@ -1,5 +1,7 @@
 # CYRILLIC NUMERAL SYSTEM
 
+🌏 English [Русский](./INTRODUCTION.ru.md)
+
 ## 1. Numerals
 Cyrillic numeral system has individual letters assigned to represent numbers from 1 to 9 in registries from digits to hundreds, for a total of 27 numerals. There's no zero numeral.
 
@@ -27,7 +29,7 @@ Cyrillic|Arabic|Cyrillic|Arabic|Cyrillic|Arabic
 |||а҃і|11|ра҃і|111
 |||к҃а|21|рк҃а|121
 
-## 3. Thousands and above
+## 3. Numbers from thousand and above
 In a number `x > 999`, the `҂` "thousand" sign is used before numerals that represent higher order of magnitude. For each thousand sign before a numeral its value is multiplied by 1000.
 
 **Examples:**
@@ -46,7 +48,7 @@ In "plain" style, "thousand" signs are prepended to each numeral in higher regis
 
 In this style, numerals representing numbers 11-19 are only swapped unless "thousand"-marked.
 
-***Examples:**
+**Examples:**
 Cyrillic|Arabic
 ---|---
 ҂р҂і҂ара҃і|111 111
@@ -72,7 +74,7 @@ Cyrillic|Arabic
 ## 5. Decoration
 
 ## 5.1 "Titlo"
-The `҃`&nbsp; "titlo" superscript sign is obligatory to Cyrillic numbers. "Titlo" is placed above the 2nd-from-last digit if it exists and is not thousand-marked, otherwise above the last digit.
+The `҃ `&nbsp; "titlo" superscript sign is obligatory to Cyrillic numbers. "Titlo" is placed above the 2nd-from-last digit if it exists and is not thousand-marked, otherwise above the last digit.
 
 Historically, "titlo" could've been placed above the 2nd digit, or above the whole number. It is possible to reproduce this with Unicode symbols "Titlo start", "titlo section", "titlo end".
 
