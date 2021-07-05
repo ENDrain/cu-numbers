@@ -49,57 +49,54 @@ class CUNumber:
         self.cu = ""
         self.arabic = input
         self.flags = flags
+        self.groups = []
         self.prepare()
 
     def get(self):
+        "Return the CU number string representation."
+
         return self.cu
 
     def prepare(self):
+        "Prepare the Arabic number for conversion."
+
         if self.arabic <= 0:
             raise ValueError("Non-zero integer required")
 
     def hasFlag(self, flag):
-        """Check a flag."""
+        "Check if a flag is set."
 
         return False if self.flags & flag == 0 else True
 
-    def stripDelimDots(self):
-        "Strip delimeter dots unless CU_DELIMDOT is set."
+    def build(self):
+        "Build the CU number from digit groups."
 
-        if not self.hasFlag(CU_DELIMDOT):
-            self.cu = re.sub(
-                "(\{0}(?!{1}$)|(?<!{2}[{3}])\{0}(?={1}$))".format(
-                    cu_dot, cu_tens[0], cu_thousand, cu_digits
-                ),
-                "",
-                self.cu,
-            )
+        for k in self.groups:
+            self.cu = k + self.cu
         return self
 
-    def stripAheadDot(self):
-        "Strip ahead dot."
+    def wrapDot(self):
+        "Prepend and/or append dots if appropriate flags are set."
 
-        self.cu = re.sub("^\.([\S]*)", "\g<1>", self.cu)
+        self.cu = (
+            (cu_dot if self.hasFlag(CU_PREDOT) else "")
+            + self.cu
+            + (cu_dot if self.hasFlag(CU_ENDDOT) else "")
+        )
+
         return self
 
-    def prependDot(self):
-        "Prepend dot if CU_PREDOT is set."
+    def delimDots(self):
+        "Insert dots between digit groups if appropriate flag is set."
 
-        if self.hasFlag(CU_PREDOT):
-            self.cu = re.sub("^[^\.][\S]*", ".\g<0>", self.cu)
-            return self
-        else:
-            return self.stripAheadDot()
+        if self.hasFlag(CU_DELIMDOT):
+            for i, k in enumerate(self.groups[1:]):
+                self.groups[i + 1] = k + cu_dot
 
-    def appendDot(self):
-        "Append dot if CU_ENDDOT is set."
-
-        if self.hasFlag(CU_ENDDOT):
-            self.cu = re.sub("[\S]*[^\.]$", "\g<0>.", self.cu)
         return self
 
     def appendTitlo(self):
-        """Append "titlo" unless CU_NOTITLO is set."""
+        "Append titlo unless appropriate flag is set."
 
         if not self.hasFlag(CU_NOTITLO):
             result = re.subn(
@@ -108,75 +105,114 @@ class CUNumber:
                 self.cu,
             )
             self.cu = result[0] if result[1] > 0 else self.cu + cu_titlo
+
         return self
 
-    def swapDigits(input):
-        """Swap digits in 11-19 unless "і" is "thousand"-marked."""
+    def appendThousandMarksDelim(input, index):
+        "Append thousand marks in delimeter style."
 
-        result = re.sub(
-            "(?<!{0})({1})([{2}])".format(cu_thousand, cu_tens[0], cu_digits),
-            "\g<2>\g<1>",
-            input,
-        )
+        if input:
+            return cu_thousand * index + input
+        else:
+            return ""
+
+    def appendThousandMarksPlain(input, index):
+        "Append thousand marks in plain style."
+
+        result = ""
+
+        for i in input:
+            result = result + CUNumber.appendThousandMarksDelim(i, index)
+
         return result
 
-    def processDigit(input, registry=0, multiplier=0):
-        "Convert the Arabic digit to a Cyrillic numeral."
+    def appendThousandMarks(self):
+        "Append thousand marks according to chosen style (plain or delimeter)."
 
-        return (
-            cu_thousand * multiplier + cu_dict[10 * registry + input] if input else ""
+        method = (
+            CUNumber.appendThousandMarksPlain
+            if self.hasFlag(CU_PLAIN)
+            else CUNumber.appendThousandMarksDelim
         )
 
-    def _processNumberPlain(input, registry=0, result=""):
-        "Process the Arabic number per digit."
-        # @registry is current registry
+        for i, k in enumerate(self.groups):
 
-        if input:
-            result = (
-                CUNumber.processDigit(input % 10, registry % 3, registry // 3) + result
-            )
-            return CUNumber._processNumberPlain(input // 10, registry + 1, result)
-        else:
-            return CUNumber.swapDigits(result)
+            self.groups[i] = method(self.groups[i], i)
 
-    def processGroup(input, group=0):
-        "Process the group of 3 Arabic digits."
-
-        input = input % 1000
-        return (
-            (cu_dot + cu_thousand * group + CUNumber._processNumberPlain(input))
-            if input
-            else ""
-        )
-
-    def _processNumberDelim(input, group=0, result=""):
-        "Process the Arabic number per groups of 3 digits."
-        # @index is current group of digits number (i.e. amount of multiplications of thousand)
-
-        if input:
-            result = CUNumber.processGroup(input, group) + result
-            return CUNumber._processNumberDelim(input // 1000, group + 1, result)
-        else:
-            return result
-
-    def processNumberPlain(self):
-
-        self.cu = CUNumber._processNumberPlain(self.arabic)
         return self
 
-    def processNumberDelim(self):
+    def swapDigits(self):
+        "Swap digits in 11-19."
 
-        self.cu = CUNumber._processNumberDelim(self.arabic)
+        for i, k in enumerate(self.groups):
+
+            self.groups[i] = re.sub(
+                "({0})([{1}])".format(cu_tens[0], cu_digits),
+                "\g<2>\g<1>",
+                self.groups[i],
+            )
+
+        return self
+
+    def purgeEmptyGroups(self):
+        "Remove empty groups from digit group collection."
+
+        for i, k in enumerate(self.groups):
+
+            if not k:
+                self.groups.pop(i)
+
+        return self
+
+    def getDigit(input, index):
+        "Get CU digit for given Arabic digit."
+
+        if input:
+            return cu_dict[input + 10 * index]
+        else:
+            return ""
+
+    def translateGroups(self):
+        "Translate the Arabic number per group."
+
+        for i, k in enumerate(self.groups):
+
+            result = ""
+            index = 0
+
+            while k > 0:
+                result = CUNumber.getDigit(k % 10, index) + result
+                index = index + 1
+                k = k // 10
+
+            self.groups[i] = result
+
+        return self
+
+    def breakIntoGroups(self):
+        "Break the Arabic number into groups of 3 digits."
+
+        while self.arabic > 0:
+            self.groups.append(self.arabic % 1000)
+            self.arabic = self.arabic // 1000
+
         return self
 
     def convert(self):
         "Convert the Arabic number to Cyrillic."
 
-        if self.arabic < 1001 or self.hasFlag(CU_PLAIN):
-            self.processNumberPlain()
-        else:
-            self.processNumberDelim()
-        return self.stripDelimDots().prependDot().appendDot().appendTitlo()
+        return (
+            self.breakIntoGroups()
+            .translateGroups()
+            .appendThousandMarks()
+            .purgeEmptyGroups()
+            .swapDigits()
+            .delimDots()
+            .build()
+            .appendTitlo()
+            .wrapDot()
+            .get()
+        )
 
 
 class ArabicNumber:
@@ -282,13 +318,13 @@ def isinstance(input, condition, msg):
 
 def to_cu(input, flags=0):
     """
-    Convert a number into Cyrillic numeral system.
+    Convert a number into Cyrillic numeral system. Uses plain style by default.
 
     Requires a non-zero integer.
     """
 
     if isinstance(input, int, "Non-zero integer required, got {0}"):
-        return CUNumber(input, flags).convert().get()
+        return CUNumber(input, flags).convert()
 
 
 def to_arab(input, flags=0):
