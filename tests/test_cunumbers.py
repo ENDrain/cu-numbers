@@ -20,35 +20,35 @@ class ToCUPlainTestCase(unittest.TestCase):
 
     def testToCUThousand(self):
         self.assertEqual(to_cu(1000), "҂а҃")
-        self.assertEqual(to_cu(1006, CU_PLAIN), "҂а҃ѕ")
-        self.assertEqual(to_cu(1010, CU_PLAIN), "҂а҃і")
+        self.assertEqual(to_cu(1006), "҂а҃ѕ")
+        self.assertEqual(to_cu(1010), "҂а҃і")
         self.assertEqual(to_cu(1015), "҂ає҃і")
         self.assertEqual(to_cu(1444), "҂аум҃д")
-        self.assertEqual(to_cu(11000, CU_PLAIN), "҂і҂а҃")
+        self.assertEqual(to_cu(11000), "҂і҂а҃")
 
     def testToCUBig(self):
-        self.assertEqual(to_cu(10001010001, CU_PLAIN), "҂҂҂і҂҂а҂і҃а")
-        self.assertEqual(to_cu(50000000000, CU_PLAIN), "҂҂҂н҃")
-        self.assertEqual(to_cu(60000070000, CU_PLAIN), "҂҂҂ѯ҂ѻ҃")
-        self.assertEqual(to_cu(111111111, CU_PLAIN), "҂҂р҂҂і҂҂а҂р҂і҂ара҃і")
+        self.assertEqual(to_cu(10001010001), "҂҂҂і҂҂а҂і҃а")
+        self.assertEqual(to_cu(50000000000), "҂҂҂н҃")
+        self.assertEqual(to_cu(60000070000), "҂҂҂ѯ҂ѻ҃")
+        self.assertEqual(to_cu(111111111), "҂҂р҂҂і҂҂а҂р҂і҂ара҃і")
 
 
 class ToCUDelimTestCase(unittest.TestCase):
     def testToCUDelimThousand(self):
-        self.assertEqual(to_cu(1010), "҂а.і҃")
-        self.assertEqual(to_cu(11000), "҂а҃і")
+        self.assertEqual(to_cu(1010, CU_DELIM), "҂а.і҃")
+        self.assertEqual(to_cu(11000, CU_DELIM), "҂а҃і")
 
     def testToCUDelimBig(self):
-        self.assertEqual(to_cu(10001010001), "҂҂҂і҂҂а҂і҃а")
-        self.assertEqual(to_cu(50000000000), "҂҂҂н҃")
-        self.assertEqual(to_cu(60000070000), "҂҂҂ѯ҂ѻ҃")
-        self.assertEqual(to_cu(111111111), "҂҂раі҂раіра҃і")
+        self.assertEqual(to_cu(10001010001, CU_DELIM), "҂҂҂і҂҂а҂і҃а")
+        self.assertEqual(to_cu(50000000000, CU_DELIM), "҂҂҂н҃")
+        self.assertEqual(to_cu(60000070000, CU_DELIM), "҂҂҂ѯ҂ѻ҃")
+        self.assertEqual(to_cu(111111111, CU_DELIM), "҂҂раі҂раіра҃і")
 
 
 class ToCUFlagsTestCase(unittest.TestCase):
     def testToCUNotitlo(self):
         self.assertEqual(to_cu(1, CU_NOTITLO), "а")
-        self.assertEqual(to_cu(11000, CU_PLAIN + CU_NOTITLO), "҂і҂а")
+        self.assertEqual(to_cu(11000, CU_NOTITLO), "҂і҂а")
 
     def testToCUEnddot(self):
         self.assertEqual(to_cu(1, CU_ENDDOT), "а҃.")

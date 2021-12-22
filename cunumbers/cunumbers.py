@@ -5,12 +5,13 @@
 
 import re
 
-CU_DELIM = 0x1  # Write in delim style
-CU_PLAIN = 0x10  # Read/write in plain style
+CU_PLAIN = 0x1  # Write in plain style
+CU_DELIM = 0x10  # Read/write in delim style
 CU_NOTITLO = 0x100  # DO NOT append titlo
 CU_ENDDOT = 0x1000  # Append dot
 CU_PREDOT = 0x10000  # Prepend dot
-CU_DELIMDOT = 0x100000 | CU_DELIM  # Delimeter dots (delim mode only)
+CU_DOT = 0x100000
+CU_DELIMDOT = CU_DOT | CU_DELIM  # Delimeter dots (forces delim style)
 CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots
 CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots
 
@@ -89,7 +90,7 @@ class CUNumber:
     def delimDots(self):
         "Insert dots between digit groups if appropriate flag is set."
 
-        if self.hasFlag(CU_DELIMDOT):
+        if self.hasFlag(CU_DOT):
             for i, k in enumerate(self.groups[1:]):
                 self.groups[i + 1] = k + cu_dot
 
@@ -130,9 +131,9 @@ class CUNumber:
         "Append thousand marks according to chosen style (plain or delimeter)."
 
         method = (
-            CUNumber.appendThousandMarksPlain
-            if self.hasFlag(CU_PLAIN)
-            else CUNumber.appendThousandMarksDelim
+            CUNumber.appendThousandMarksDelim
+            if self.hasFlag(CU_DELIM)
+            else CUNumber.appendThousandMarksPlain
         )
 
         for i, k in enumerate(self.groups):
