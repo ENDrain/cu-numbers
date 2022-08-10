@@ -76,30 +76,26 @@ class CUNumber:
             self.cu = k + self.cu
         return self
 
-    def wrapDot(self):
+    def wrapDot(self, cond_a, cond_b):
         "Prepend and/or append dots if appropriate flags are set."
 
-        self.cu = (
-            (cu_dot if self.hasFlag(CU_PREDOT) else "")
-            + self.cu
-            + (cu_dot if self.hasFlag(CU_ENDDOT) else "")
-        )
+        self.cu = (cu_dot if cond_a else "") + self.cu + (cu_dot if cond_b else "")
 
         return self
 
-    def delimDots(self):
+    def delimDots(self, cond):
         "Insert dots between digit groups if appropriate flag is set."
 
-        if self.hasFlag(CU_DOT):
+        if cond:
             for i, k in enumerate(self.groups[1:]):
                 self.groups[i + 1] = k + cu_dot
 
         return self
 
-    def appendTitlo(self):
+    def appendTitlo(self, cond):
         "Append titlo unless appropriate flag is set."
 
-        if not self.hasFlag(CU_NOTITLO):
+        if not cond:
             result = re.subn(
                 "([\S]+)(?<![{0}\{1}])([\S])$".format(cu_thousand, cu_dot),
                 "\g<1>{0}\g<2>".format(cu_titlo),
@@ -127,12 +123,12 @@ class CUNumber:
 
         return result
 
-    def appendThousandMarks(self):
+    def appendThousandMarks(self, cond):
         "Append thousand marks according to chosen style (plain or delimeter)."
 
         method = (
             CUNumber.appendThousandMarksDelim
-            if self.hasFlag(CU_DELIM)
+            if cond
             else CUNumber.appendThousandMarksPlain
         )
 
@@ -190,13 +186,13 @@ class CUNumber:
 
         return self
 
-    def ambiguityCheck(self):
-        if self.hasFlag(CU_DELIM):
+    def ambiguityCheck(self, cond, flag):
+        if cond:
             try:
                 if (self.groups[0] // 10 % 10 == 1) and (
                     self.groups[1] // 10 % 10 == 0
                 ):
-                    self.flags = self.flags | CU_DOT
+                    self.flags = self.flags | flag
             finally:
                 return self
         else:
@@ -216,15 +212,15 @@ class CUNumber:
 
         return (
             self.breakIntoGroups()
-            .ambiguityCheck()
+            .ambiguityCheck(self.hasFlag(CU_DELIM), CU_DOT)
             .translateGroups()
-            .appendThousandMarks()
+            .appendThousandMarks(self.hasFlag(CU_DELIM))
             .purgeEmptyGroups()
             .swapDigits()
-            .delimDots()
+            .delimDots(self.hasFlag(CU_DOT))
             .build()
-            .appendTitlo()
-            .wrapDot()
+            .appendTitlo(self.hasFlag(CU_NOTITLO))
+            .wrapDot(self.hasFlag(CU_PREDOT), self.hasFlag(CU_ENDDOT))
             .get()
         )
 
