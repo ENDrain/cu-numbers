@@ -27,21 +27,8 @@ cu_dict = "{0}{1}{0}{2}{0}{3}".format(  # CU numerals dictionary
     cu_null, cu_digits, cu_tens, cu_hundreds
 )
 
-cu_group_regex = (  # Regex for a basic CU number x < 1000
-    "[{0}]?(?:[{2}]?{3}|[{1}]?[{2}]?)".format(
-        cu_hundreds, cu_tens[1:], cu_digits, cu_tens[0]
-    )
-)
-cu_delim_regex = "({0}*{1})".format(  # Regex for a digit group in "delim" style
-    cu_thousand, cu_group_regex
-)
-cu_plain_regex = (  # Regex for a single digit in "plain" style
-    "({0}+[{1}]{2}|(?:{3})$)".format(
-        cu_thousand,
-        cu_dict.replace(cu_null, ""),
-        "{1}",
-        cu_group_regex,
-    )
+cu_regex = "{0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?)".format(
+    cu_thousand, cu_hundreds, cu_tens[1:], cu_digits, cu_tens[0]
 )
 
 
@@ -229,9 +216,12 @@ class ArabicNumber:
     def __init__(self, input):
         self.cu = input
         self.arabic = 0
+        self.groups = []
         self.prepare()
 
     def get(self):
+        "Return the Arabic number integer representation."
+
         return self.arabic
 
     def prepare(self):
@@ -246,76 +236,70 @@ class ArabicNumber:
         else:
             raise ValueError("Non-empty string required")
 
-    def processDigit(input, registry=0):
-        "Convert the Cyrillic numeral to an arabic digit."
+    def getDigit(input):
+        "Get Arabic digit for the given CU digit."
 
         index = cu_dict.index(input)  # Find current digit in dictionary
-        number = index % 10  # Digit
-        registry = index // 10  # Digit registry
-        return number * pow(10, registry)  # Resulting number
+        number = index % 10  # Get the digit
+        registry = index // 10  # Get digit registry
 
-    def processGroup(input, group=0):
-        "Process the group of Cyrillic numerals."
+        return number * pow(10, registry)
 
-        subtotal = multiplier = 0
-        for k in input:
-            if k == cu_thousand:
-                multiplier += 1
-                continue
-            subtotal += ArabicNumber.processDigit(k)
+    def calculateMultiplier(index, input):
+        "Calculate multiplier for adjusting digit group value to its registry."
 
-        # Multiply result by 1000 - times "҂" marks or current group
-        return subtotal * pow(1000, max(multiplier, group))
+        multiplier = (
+            re.match("({0}*)".format(cu_thousand), input).groups()[0].count(cu_thousand)
+        )  # Count trailing thousand marks in the group
+        multiplier = pow(1000, multiplier if multiplier else index - 1)
+        # Use thousand marks if present, otherwise use group index
+        return multiplier
 
-    def prepareGroups(input, regex):
-        "Prepare Cyrillic numeral groups for conversion."
+    def translateGroups(self):
+        "Translate the Cyrillic number per group."
 
-        groups = re.split(regex, input)
+        for i, k in enumerate(self.groups):
 
-        while groups.count(""):  # Purge empty strs from collection
-            groups.remove("")
-        groups.reverse()
-        return groups
+            subtotal = 0  # Current group total value
 
-    def _processNumberPlain(input):
-        "Process the Cyrillic number per digit."
+            multiplier = ArabicNumber.calculateMultiplier(i, k)
+            k = re.sub(cu_thousand, "", k)  # Strip thousand marks
+            for l in k:
+                subtotal += ArabicNumber.getDigit(l)
 
-        groups = ArabicNumber.prepareGroups(input, cu_plain_regex)
+            self.arabic += subtotal * multiplier
 
-        result = 0
-        for k in groups:
-            result += ArabicNumber.processGroup(k)
-        return result
-
-    def _processNumberDelim(input):
-        "Process the Cyrillic number per groups of 1-3 digits."
-
-        groups = ArabicNumber.prepareGroups(input, cu_delim_regex)
-
-        result = 0
-        for i, k in enumerate(groups):
-            result += ArabicNumber.processGroup(k, i)
-        return result
-
-    def processNumberPlain(self):
-        self.arabic = ArabicNumber._processNumberPlain(self.cu)
         return self
 
-    def processNumberDelim(self):
-        self.arabic = ArabicNumber._processNumberDelim(self.cu)
+    def breakIntoGroups(self, regex):
+        "Break the Cyrillic number in groups of 1-3 digits."
+
+        self.groups = re.split(regex, self.cu)  # Break into groups
+        for i, k in enumerate(self.groups):
+            self.groups.pop(i) if not k else True  # Purge empty groups
+        self.groups.reverse()  # Reverse groups (to ascending order)
+
         return self
 
-    def convert(self):
-        "Choose the Cyrillic number to Arabic."
+    def validate(self, regex):
+        "Validate that input is a Cyrillic number."
 
-        if re.fullmatch("{0}+".format(cu_plain_regex), self.cu):
-            return self.processNumberPlain()
-        elif re.fullmatch("{0}+".format(cu_delim_regex), self.cu):
-            return self.processNumberDelim()
+        if re.fullmatch(regex, self.cu):
+            return self
         else:
             raise ValueError(
                 "String does not match any pattern for Cyrillic numeral system number"
             )
+
+    def convert(self):
+        "Convert the Cyrillic number to Arabic."
+
+        return (
+            self.validate("({0})+".format(cu_regex))
+            .breakIntoGroups("({0})".format(cu_regex))
+            .translateGroups()
+            .get()
+        )
 
 
 def isinstance(input, condition, msg):
@@ -339,10 +323,10 @@ def to_cu(input, flags=0):
 
 def to_arab(input, flags=0):
     """
-    Convert a number into Arabic numeral system .
+    Convert a number into Arabic numeral system.
 
     Requires a non-empty string.
     """
 
     if isinstance(input, str, "Non-empty string required, got {0}"):
-        return ArabicNumber(input).convert().get()
+        return ArabicNumber(input).convert()
