@@ -34,9 +34,15 @@ class ToCUPlainTestCase(unittest.TestCase):
 
 
 class ToCUDelimTestCase(unittest.TestCase):
-    def testToCUDelimThousand(self):
+    def testToCUDelimAmbiguity(self):
         self.assertEqual(to_cu(1010, CU_DELIM), "҂а.і҃")
         self.assertEqual(to_cu(11000, CU_DELIM), "҂а҃і")
+        self.assertEqual(to_cu(10010, CU_DELIM), "҂і҃і")
+        self.assertEqual(to_cu(110010, CU_DELIM), "҂рі҃і")
+        self.assertEqual(to_cu(100010, CU_DELIM), "҂р.і҃")
+        self.assertEqual(to_cu(110000, CU_DELIM), "҂р҃і")
+        self.assertEqual(to_cu(100011, CU_DELIM), "҂р.а҃і")
+        self.assertEqual(to_cu(111000, CU_DELIM), "҂ра҃і")
 
     def testToCUDelimBig(self):
         self.assertEqual(to_cu(10001010001, CU_DELIM), "҂҂҂і҂҂а҂і҃а")

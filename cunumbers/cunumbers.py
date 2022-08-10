@@ -10,7 +10,7 @@ CU_DELIM = 0x10  # Read/write in delim style
 CU_NOTITLO = 0x100  # DO NOT append titlo
 CU_ENDDOT = 0x1000  # Append dot
 CU_PREDOT = 0x10000  # Prepend dot
-CU_DOT = 0x100000
+CU_DOT = 0x100000  # Delimeter dots (private, for internal flag checks)
 CU_DELIMDOT = CU_DOT | CU_DELIM  # Delimeter dots (forces delim style)
 CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots
 CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots
@@ -190,6 +190,18 @@ class CUNumber:
 
         return self
 
+    def ambiguityCheck(self):
+        if self.hasFlag(CU_DELIM):
+            try:
+                if (self.groups[0] // 10 % 10 == 1) and (
+                    self.groups[1] // 10 % 10 == 0
+                ):
+                    self.flags = self.flags | CU_DOT
+            finally:
+                return self
+        else:
+            return self
+
     def breakIntoGroups(self):
         "Break the Arabic number into groups of 3 digits."
 
@@ -204,6 +216,7 @@ class CUNumber:
 
         return (
             self.breakIntoGroups()
+            .ambiguityCheck()
             .translateGroups()
             .appendThousandMarks()
             .purgeEmptyGroups()
