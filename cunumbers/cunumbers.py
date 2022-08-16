@@ -4,6 +4,7 @@
 "Module for number conversion between Arabic and Cyrillic numeral systems."
 
 import re
+from enum import Enum, unique
 
 CU_PLAIN = 0x1  # Write in plain style
 CU_DELIM = 0x10  # Read/write in delim style
@@ -15,20 +16,76 @@ CU_DELIMDOT = CU_DOT | CU_DELIM  # Delimeter dots (forces delim style)
 CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots
 CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots
 
-cu_digits = "авгдєѕзиѳ"  # CU digit numerals
-cu_tens = "іклмнѯѻпч"  # CU tens numerals
-cu_hundreds = "рстуфхѱѿц"  # CU hundreds numerals
-cu_thousand = "҂"  # "Thousand" mark
-cu_titlo = "҃"  # "Titlo" decorator
-cu_dot = "."  # Dot decorator
 
-cu_null = "\uE000"  # Placeholder character to represent zero in CU numbers
-cu_dict = "{0}{1}{0}{2}{0}{3}".format(  # CU numerals dictionary
-    cu_null, cu_digits, cu_tens, cu_hundreds
-)
+@unique
+class Numerals(Enum):
+    @classmethod
+    def get(cls, input):
+        try:
+            return cls[input].value
+        except:
+            try:
+                return cls(input).name
+            except:
+                return ""
+
+    @classmethod
+    def __getmany(cls, start=1, end=10, step=1):
+        r = ""
+        for i in range(start * step, end * step, step):
+            r += cls(i).name
+        return r
+
+    @classmethod
+    def digits(cls, start=1, end=10):
+        return cls.__getmany(start, end, 1)
+
+    @classmethod
+    def tens(cls, start=1, end=10):
+        return cls.__getmany(start, end, 10)
+
+    @classmethod
+    def hundreds(cls, start=1, end=10):
+        return cls.__getmany(start, end, 100)
+
+    а = 1
+    в = 2
+    г = 3
+    д = 4
+    є = 5
+    ѕ = 6
+    з = 7
+    и = 8
+    ѳ = 9
+    і = 10
+    к = 20
+    л = 30
+    м = 40
+    н = 50
+    ѯ = 60
+    ѻ = 70
+    п = 80
+    ч = 90
+    р = 100
+    с = 200
+    т = 300
+    у = 400
+    ф = 500
+    х = 600
+    ѱ = 700
+    ѿ = 800
+    ц = 900
+    THOUSAND = "҂"  # "Thousand" mark
+    TITLO = "҃"  # "Titlo" decorator
+    DOT = "."  # Dot decorator
+
 
 cu_regex = "{0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?)".format(
-    cu_thousand, cu_hundreds, cu_tens[1:], cu_digits, cu_tens[0]
+    Numerals.get("THOUSAND"),
+    Numerals.hundreds(),
+    Numerals.tens(2),
+    Numerals.digits(),
+    Numerals.get(10),
 )
 
 
@@ -66,7 +123,11 @@ class CUNumber:
     def wrapDot(self, cond_a, cond_b):
         "Prepend and/or append dots if appropriate flags are set."
 
-        self.cu = (cu_dot if cond_a else "") + self.cu + (cu_dot if cond_b else "")
+        self.cu = (
+            (Numerals.get("DOT") if cond_a else "")
+            + self.cu
+            + (Numerals.get("DOT") if cond_b else "")
+        )
 
         return self
 
@@ -75,7 +136,7 @@ class CUNumber:
 
         if cond:
             for i, k in enumerate(self.groups[1:]):
-                self.groups[i + 1] = k + cu_dot
+                self.groups[i + 1] = k + Numerals.get("DOT")
 
         return self
 
@@ -84,11 +145,36 @@ class CUNumber:
 
         if not cond:
             result = re.subn(
-                "([\S]+)(?<![{0}\{1}])([\S])$".format(cu_thousand, cu_dot),
-                "\g<1>{0}\g<2>".format(cu_titlo),
+                "([\S]+)(?<![{0}\{1}])([\S])$".format(
+                    Numerals.get("THOUSAND"), Numerals.get("DOT")
+                ),
+                "\g<1>{0}\g<2>".format(Numerals.get("TITLO")),
                 self.cu,
             )
-            self.cu = result[0] if result[1] > 0 else self.cu + cu_titlo
+            self.cu = result[0] if result[1] > 0 else self.cu + Numerals.get("TITLO")
+
+        return self
+
+    def swapDigits(self):
+        "Swap digits in 11-19."
+
+        for i, k in enumerate(self.groups):
+
+            self.groups[i] = re.sub(
+                "({0})([{1}])".format(Numerals.get(10), Numerals.digits()),
+                "\g<2>\g<1>",
+                self.groups[i],
+            )
+
+        return self
+
+    def purgeEmptyGroups(self):
+        "Remove empty groups from digit group collection."
+
+        for i, k in enumerate(self.groups):
+
+            if not k:
+                self.groups.pop(i)
 
         return self
 
@@ -96,7 +182,7 @@ class CUNumber:
         "Append thousand marks in delimeter style."
 
         if input:
-            return cu_thousand * index + input
+            return Numerals.get("THOUSAND") * index + input
         else:
             return ""
 
@@ -125,36 +211,10 @@ class CUNumber:
 
         return self
 
-    def swapDigits(self):
-        "Swap digits in 11-19."
-
-        for i, k in enumerate(self.groups):
-
-            self.groups[i] = re.sub(
-                "({0})([{1}])".format(cu_tens[0], cu_digits),
-                "\g<2>\g<1>",
-                self.groups[i],
-            )
-
-        return self
-
-    def purgeEmptyGroups(self):
-        "Remove empty groups from digit group collection."
-
-        for i, k in enumerate(self.groups):
-
-            if not k:
-                self.groups.pop(i)
-
-        return self
-
-    def getDigit(input, index):
+    def getDigit(input):
         "Get CU digit for given Arabic digit."
 
-        if input:
-            return cu_dict[input + 10 * index]
-        else:
-            return ""
+        return Numerals.get(input) if input else ""
 
     def translateGroups(self):
         "Translate the Arabic number per group."
@@ -165,7 +225,7 @@ class CUNumber:
             index = 0
 
             while k > 0:
-                result = CUNumber.getDigit(k % 10, index) + result
+                result = CUNumber.getDigit(k % 10 * pow(10, index)) + result
                 index = index + 1
                 k = k // 10
 
@@ -229,27 +289,20 @@ class ArabicNumber:
 
         if self.cu:
             self.cu = re.sub(
-                "[{0}\.]".format(cu_titlo), "", self.cu
+                "[{0}\.]".format(Numerals.get("TITLO")), "", self.cu
             )  # Strip ҃"҃ " and dots
             self.cu = str.strip(self.cu)
             self.cu = str.lower(self.cu)
         else:
             raise ValueError("Non-empty string required")
 
-    def getDigit(input):
-        "Get Arabic digit for the given CU digit."
-
-        index = cu_dict.index(input)  # Find current digit in dictionary
-        number = index % 10  # Get the digit
-        registry = index // 10  # Get digit registry
-
-        return number * pow(10, registry)
-
     def calculateMultiplier(index, input):
         "Calculate multiplier for adjusting digit group value to its registry."
 
         multiplier = (
-            re.match("({0}*)".format(cu_thousand), input).groups()[0].count(cu_thousand)
+            re.match("({0}*)".format(Numerals.get("THOUSAND")), input)
+            .groups()[0]
+            .count(Numerals.get("THOUSAND"))
         )  # Count trailing thousand marks in the group
         multiplier = pow(1000, multiplier if multiplier else index - 1)
         # Use thousand marks if present, otherwise use group index
@@ -263,9 +316,9 @@ class ArabicNumber:
             subtotal = 0  # Current group total value
 
             multiplier = ArabicNumber.calculateMultiplier(i, k)
-            k = re.sub(cu_thousand, "", k)  # Strip thousand marks
+            k = re.sub(Numerals.get("THOUSAND"), "", k)  # Strip thousand marks
             for l in k:
-                subtotal += ArabicNumber.getDigit(l)
+                subtotal += Numerals.get(l)
 
             self.arabic += subtotal * multiplier
 
