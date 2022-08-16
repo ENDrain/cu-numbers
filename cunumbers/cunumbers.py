@@ -4,7 +4,7 @@
 "Module for number conversion between Arabic and Cyrillic numeral systems."
 
 import re
-from enum import Enum, unique
+from cunumbers.dictionary import HebrewTypeDictionary
 
 CU_PLAIN = 0x1  # Write in plain style
 CU_DELIM = 0x10  # Read/write in delim style
@@ -17,36 +17,7 @@ CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots
 CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots
 
 
-@unique
-class Numerals(Enum):
-    @classmethod
-    def get(cls, input):
-        try:
-            return cls[input].value
-        except:
-            try:
-                return cls(input).name
-            except:
-                return ""
-
-    @classmethod
-    def __getmany(cls, start=1, end=10, step=1):
-        r = ""
-        for i in range(start * step, end * step, step):
-            r += cls(i).name
-        return r
-
-    @classmethod
-    def digits(cls, start=1, end=10):
-        return cls.__getmany(start, end, 1)
-
-    @classmethod
-    def tens(cls, start=1, end=10):
-        return cls.__getmany(start, end, 10)
-
-    @classmethod
-    def hundreds(cls, start=1, end=10):
-        return cls.__getmany(start, end, 100)
+class Numerals(HebrewTypeDictionary):
 
     а = 1
     в = 2
