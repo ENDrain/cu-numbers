@@ -61,16 +61,16 @@ class ArabicNumber(ArabicNumberConverter):
         "Build the CU number from digit groups."
 
         for k in self.groups:
-            self.alphabetic = k + self.alphabetic
+            self.alphabetic = "{0}{1}".format(k, self.alphabetic)
         return self
 
     def wrapDot(self, cond_a, cond_b):
         "Prepend and/or append dots if appropriate flags are set."
 
-        self.alphabetic = (
-            (self.dict.get("DOT") if cond_a else "")
-            + self.alphabetic
-            + (self.dict.get("DOT") if cond_b else "")
+        self.alphabetic = "{0}{1}{2}".format(
+            self.dict.get("DOT") if cond_a else "",
+            self.alphabetic,
+            self.dict.get("DOT") if cond_b else "",
         )
 
         return self
@@ -80,7 +80,7 @@ class ArabicNumber(ArabicNumberConverter):
 
         if cond:
             for i, k in enumerate(self.groups[1:]):
-                self.groups[i + 1] = k + self.dict.get("DOT")
+                self.groups[i + 1] = "{0}{1}".format(k, self.dict.get("DOT"))
 
         return self
 
@@ -95,8 +95,11 @@ class ArabicNumber(ArabicNumberConverter):
                 "\g<1>{0}\g<2>".format(self.dict.get("TITLO")),
                 self.alphabetic,
             )
+
             self.alphabetic = (
-                result[0] if result[1] > 0 else self.alphabetic + self.dict.get("TITLO")
+                result[0]
+                if result[1] > 0
+                else "{0}{1}".format(self.alphabetic, self.dict.get("TITLO"))
             )
 
         return self
@@ -129,7 +132,7 @@ class ArabicNumber(ArabicNumberConverter):
         "Append thousand marks in delimeter style."
 
         if input:
-            return cls.dict.get("THOUSAND") * index + input
+            return "{0}{1}".format(cls.dict.get("THOUSAND") * index, input)
         else:
             return ""
 
@@ -140,7 +143,7 @@ class ArabicNumber(ArabicNumberConverter):
         result = ""
 
         for i in input:
-            result = result + cls.appendThousandMarksDelim(i, index)
+            result = "{0}{1}".format(result, cls.appendThousandMarksDelim(i, index))
 
         return result
 
