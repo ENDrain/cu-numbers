@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
-# For licensing information see LICENSE file included in the project's root directory.
+# For licensing information see LICENSE file included with the project.
 # To learn about Cyrillic numeral system (CU), see INTRODUCTION.md
-"This module provides tools for two-way conversion with Cyrillic numeral system."
+"This module provides tools for reading and writing numbers in Cyrillic numeral system."
 
 import re
 from omninumeric.greek import *

@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
-# For licensing information see LICENSE file included in the project's root directory.
+# For licensing information see LICENSE file included with the project.
 """
-This module provides tools for two-way conversion with Old Greek numeral system.
+This module provides tools for reading and writing numbers in Old Greek numeral system.
 
 WIP
 """

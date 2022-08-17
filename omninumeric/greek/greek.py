@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
-# For licensing information see LICENSE file included in the project's root directory.
-"This module provides basic tools for two-way conversion with Greek-type alphabetic numeral systems."
+# For licensing information see LICENSE file included with the project.
+"This module provides basic tools for reading and writing numbers in Greek-type alphabetic numeral systems."
 
 import re
 
