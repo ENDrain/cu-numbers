@@ -1,6 +1,6 @@
 from .cyrillic import (
-    to_alphabetic,
-    to_arabic,
+    ArabicNumber,
+    CyrillicNumber,
     to_cu,
     to_arab,
     CU_DELIM,

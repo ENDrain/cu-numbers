@@ -4,6 +4,14 @@
 from enum import Enum, unique
 
 
+def isinstance(value, condition, msg):
+    t = type(value)
+    if t == condition:
+        return True
+    else:
+        raise TypeError(msg.format(t))
+
+
 class Dictionary(Enum):
     @classmethod
     def get(cls, input):
@@ -18,7 +26,7 @@ class Dictionary(Enum):
 
 class GreekTypeDictionary(Dictionary):
     @classmethod
-    def __getmany(cls, start=1, end=10, step=1):
+    def _getmany(cls, start=1, end=10, step=1):
         r = ""
         for i in range(start * step, end * step, step):
             r += cls(i).name
@@ -26,85 +34,89 @@ class GreekTypeDictionary(Dictionary):
 
     @classmethod
     def digits(cls, start=1, end=10):
-        return cls.__getmany(start, end, 1)
+        return cls._getmany(start, end, 1)
 
     @classmethod
     def tens(cls, start=1, end=10):
-        return cls.__getmany(start, end, 10)
+        return cls._getmany(start, end, 10)
 
     @classmethod
     def hundreds(cls, start=1, end=10):
-        return cls.__getmany(start, end, 100)
+        return cls._getmany(start, end, 100)
 
 
-class ArabicNumberConverter:
+class NumberConverter:
+    def _convert(self, value, condition, msg):
+        if isinstance(value, condition, msg):
+            return self
 
-    dict = Dictionary
 
-    def prepare(self):
+class ArabicNumberConverter(NumberConverter):
+    def _prepare(self):
         "Prepare the Arabic number for conversion."
 
-        if self.arabic <= 0:
+        if self._arabic <= 0:
             raise ValueError("Non-zero integer required")
 
     def __init__(self, value, flags=0):
-        self.alphabetic = ""
-        self.arabic = value
-        self.flags = flags
-        self.groups = []
-        self.prepare()
+        self._alphabetic = ""
+        self._arabic = value
+        self._flags = flags
+        self._groups = []
+        self._prepare()
 
-    def get(self):
+    def _get(self):
         "Return the alphabetic number representation."
 
-        return self.alphabetic
+        return self._alphabetic
 
-    def hasFlag(self, flag):
+    def _hasFlag(self, flag):
         "Check if a flag is set."
 
-        return self.flags & flag
-        # return False if self.flags & flag == 0 else True
+        return self._flags & flag
+        # return False if self._flags & flag == 0 else True
+
+    def _convert(self):
+        if super()._convert(self._arabic, int, "Non-zero integer required, got {0}"):
+            return self
 
 
-class AlphabeticNumberConverter:
+class AlphabeticNumberConverter(NumberConverter):
 
-    dict = Dictionary
+    _dict = Dictionary
 
-    def prepare(self):
+    def _prepare(self):
         "Prepare the alphabetic number for conversion."
 
-        if self.alphabetic:
-            self.alphabetic = str.lower(str.strip(self.alphabetic))
-            # self.alphabetic = str.lower(self.alphabetic)
+        if self._alphabetic:
+            self._alphabetic = str.lower(str.strip(self._alphabetic))
             return self
         else:
             raise ValueError("Non-empty string required")
 
     def __init__(self, alphabetic):
 
-        self.alphabetic = alphabetic
-        self.arabic = 0
-        self.groups = []
-        self.prepare()
+        self._alphabetic = alphabetic
+        self._arabic = 0
+        self._groups = []
+        self._prepare()
 
-    def get(self):
+    def _get(self):
         "Return the Arabic number representation."
 
-        return self.arabic
+        return self._arabic
 
     @classmethod
-    def translate(cls, alphabetic):
+    def _translate(cls, alphabetic):
 
         total = 0  # Current group total value
         for k in alphabetic:
-            total += cls.dict.get(k)
+            total += cls._dict.get(k)
 
         return total
 
-
-def isinstance(input, condition, msg):
-    t = type(input)
-    if t == condition:
-        return True
-    else:
-        raise TypeError(msg.format(t))
+    def _convert(self):
+        if super()._convert(
+            self._alphabetic, str, "Non-empty string required, got {0}"
+        ):
+            return self

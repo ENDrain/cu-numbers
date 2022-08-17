@@ -3,5 +3,4 @@ from .omninumeric import (
     GreekTypeDictionary,
     ArabicNumberConverter,
     AlphabeticNumberConverter,
-    isinstance,
 )

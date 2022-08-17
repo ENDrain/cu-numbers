@@ -4,7 +4,11 @@
 "Module for number conversion between Arabic and Cyrillic numeral systems."
 
 import re
-from omninumeric import *
+from omninumeric import (
+    GreekTypeDictionary,
+    ArabicNumberConverter,
+    AlphabeticNumberConverter,
+)
 
 CU_PLAIN = 0x1  # Write in plain style
 CU_DELIM = 0x10  # Read/write in delim style
@@ -52,192 +56,197 @@ class CyrillicDictionary(GreekTypeDictionary):
 
 
 class ArabicNumber(ArabicNumberConverter):
-    dict = CyrillicDictionary
+    _dict = CyrillicDictionary
 
     def __init__(self, value, flags=0):
         super().__init__(value, flags)
 
-    def build(self):
+    def _build(self):
         "Build the CU number from digit groups."
 
-        for k in self.groups:
-            self.alphabetic = "{0}{1}".format(k, self.alphabetic)
+        for k in self._groups:
+            self._alphabetic = "{0}{1}".format(k, self._alphabetic)
+
         return self
 
-    def wrapDot(self, cond_a, cond_b):
+    def _wrapDot(self, cond_a, cond_b):
         "Prepend and/or append dots if appropriate flags are set."
 
-        self.alphabetic = "{0}{1}{2}".format(
-            self.dict.get("DOT") if cond_a else "",
-            self.alphabetic,
-            self.dict.get("DOT") if cond_b else "",
+        self._alphabetic = "{0}{1}{2}".format(
+            self._dict.get("DOT") if cond_a else "",
+            self._alphabetic,
+            self._dict.get("DOT") if cond_b else "",
         )
 
         return self
 
-    def delimDots(self, cond):
+    def _delimDots(self, cond):
         "Insert dots between digit groups if appropriate flag is set."
 
         if cond:
-            for i, k in enumerate(self.groups[1:]):
-                self.groups[i + 1] = "{0}{1}".format(k, self.dict.get("DOT"))
+            for i, k in enumerate(self._groups[1:]):
+                self._groups[i + 1] = "{0}{1}".format(k, self._dict.get("DOT"))
 
         return self
 
-    def appendTitlo(self, cond):
+    def _appendTitlo(self, cond):
         "Append titlo unless appropriate flag is set."
 
         if not cond:
             result = re.subn(
                 "([\S]+)(?<![{0}\{1}])([\S])$".format(
-                    self.dict.get("THOUSAND"), self.dict.get("DOT")
+                    self._dict.get("THOUSAND"), self._dict.get("DOT")
                 ),
-                "\g<1>{0}\g<2>".format(self.dict.get("TITLO")),
-                self.alphabetic,
+                "\g<1>{0}\g<2>".format(self._dict.get("TITLO")),
+                self._alphabetic,
             )
-
-            self.alphabetic = (
+            self._alphabetic = (
                 result[0]
                 if result[1] > 0
-                else "{0}{1}".format(self.alphabetic, self.dict.get("TITLO"))
+                else "{0}{1}".format(self._alphabetic, self._dict.get("TITLO"))
             )
 
         return self
 
-    def swapDigits(self):
+    def _swapDigits(self):
         "Swap digits in 11-19."
 
-        for i, k in enumerate(self.groups):
+        for i, k in enumerate(self._groups):
 
-            self.groups[i] = re.sub(
-                "({0})([{1}])".format(self.dict.get(10), self.dict.digits()),
+            self._groups[i] = re.sub(
+                "({0})([{1}])".format(self._dict.get(10), self._dict.digits()),
                 "\g<2>\g<1>",
-                self.groups[i],
+                self._groups[i],
             )
 
         return self
 
-    def purgeEmptyGroups(self):
+    def _purgeEmptyGroups(self):
         "Remove empty groups from digit group collection."
 
-        for i, k in enumerate(self.groups):
+        for i, k in enumerate(self._groups):
 
             if not k:
-                self.groups.pop(i)
+                self._groups.pop(i)
 
         return self
 
     @classmethod
-    def appendThousandMarksDelim(cls, input, index):
+    def _appendThousandMarksDelim(cls, input, index):
         "Append thousand marks in delimeter style."
 
         if input:
-            return "{0}{1}".format(cls.dict.get("THOUSAND") * index, input)
+            return "{0}{1}".format(cls._dict.get("THOUSAND") * index, input)
         else:
             return ""
 
     @classmethod
-    def appendThousandMarksPlain(cls, input, index):
+    def _appendThousandMarksPlain(cls, input, index):
         "Append thousand marks in plain style."
 
         result = ""
 
         for i in input:
-            result = "{0}{1}".format(result, cls.appendThousandMarksDelim(i, index))
+            result = "{0}{1}".format(result, cls._appendThousandMarksDelim(i, index))
 
         return result
 
-    def appendThousandMarks(self, cond):
+    def _appendThousandMarks(self, cond):
         "Append thousand marks according to chosen style (plain or delimeter)."
 
         method = (
-            self.appendThousandMarksDelim if cond else self.appendThousandMarksPlain
+            self._appendThousandMarksDelim if cond else self._appendThousandMarksPlain
         )
 
-        for i, k in enumerate(self.groups):
+        for i, k in enumerate(self._groups):
 
-            self.groups[i] = method(self.groups[i], i)
+            self._groups[i] = method(self._groups[i], i)
 
         return self
 
     @classmethod
-    def getDigit(cls, input):
+    def _getDigit(cls, input):
         "Get CU digit for given Arabic digit."
 
-        return cls.dict.get(input) if input else ""
+        return cls._dict.get(input) if input else ""
 
-    def translateGroups(self):
+    def _translateGroups(self):
         "Translate the Arabic number per group."
 
-        for i, k in enumerate(self.groups):
+        for i, k in enumerate(self._groups):
 
             result = ""
             index = 0
 
             while k > 0:
-                result = self.getDigit(k % 10 * pow(10, index)) + result
+                result = self._getDigit(k % 10 * pow(10, index)) + result
                 index = index + 1
                 k = k // 10
 
-            self.groups[i] = result
+            self._groups[i] = result
 
         return self
 
-    def ambiguityCheck(self, cond, flag):
+    def _ambiguityCheck(self, cond, flag):
         if cond:
             try:
-                if (self.groups[0] // 10 % 10 == 1) and (
-                    self.groups[1] // 10 % 10 == 0
+                if (self._groups[0] // 10 % 10 == 1) and (
+                    self._groups[1] // 10 % 10 == 0
                 ):
-                    self.flags = self.flags | flag
+                    self._flags = self._flags | flag
             finally:
                 return self
         else:
             return self
 
-    def breakIntoGroups(self):
+    def _breakIntoGroups(self):
         "Break the Arabic number into groups of 3 digits."
 
-        while self.arabic > 0:
-            self.groups.append(self.arabic % 1000)
-            self.arabic = self.arabic // 1000
+        while self._arabic > 0:
+            self._groups.append(self._arabic % 1000)
+            self._arabic = self._arabic // 1000
 
         return self
 
     def convert(self):
-        "Convert the Arabic number to Cyrillic."
+        """
+        Convert an Arabic number into Cyrillic numeral system. Uses plain style by default.
 
-        return (
-            self.breakIntoGroups()
-            .ambiguityCheck(self.hasFlag(CU_DELIM), CU_DOT)
-            .translateGroups()
-            .appendThousandMarks(self.hasFlag(CU_DELIM))
-            .purgeEmptyGroups()
-            .swapDigits()
-            .delimDots(self.hasFlag(CU_DOT))
-            .build()
-            .appendTitlo(self.hasFlag(CU_NOTITLO))
-            .wrapDot(self.hasFlag(CU_PREDOT), self.hasFlag(CU_ENDDOT))
-            .get()
-        )
+        Requires a non-zero integer.
+        """
+
+        if super()._convert():
+            return (
+                self._breakIntoGroups()
+                ._ambiguityCheck(self._hasFlag(CU_DELIM), CU_DOT)
+                ._translateGroups()
+                ._appendThousandMarks(self._hasFlag(CU_DELIM))
+                ._purgeEmptyGroups()
+                ._swapDigits()
+                ._delimDots(self._hasFlag(CU_DOT))
+                ._build()
+                ._appendTitlo(self._hasFlag(CU_NOTITLO))
+                ._wrapDot(self._hasFlag(CU_PREDOT), self._hasFlag(CU_ENDDOT))
+                ._get()
+            )
 
 
 class CyrillicNumber(AlphabeticNumberConverter):
 
-    dict = CyrillicDictionary
+    _dict = CyrillicDictionary
 
-    regex = "{0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?)".format(
-        dict.get("THOUSAND"),
-        dict.hundreds(),
-        dict.tens(2),
-        dict.digits(),
-        dict.get(10),
+    _regex = "({0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?))".format(
+        _dict.get("THOUSAND"),
+        _dict.hundreds(),
+        _dict.tens(2),
+        _dict.digits(),
+        _dict.get(10),
     )
 
-    def validate(self, regex):
+    def _validate(self):
         "Validate that input is a Cyrillic number."
 
-        if re.fullmatch(regex, self.alphabetic):
+        if re.fullmatch("{0}+".format(self._regex), self._alphabetic):
             return self
         else:
             raise ValueError(
@@ -246,80 +255,69 @@ class CyrillicNumber(AlphabeticNumberConverter):
 
     def __init__(self, alphabetic):
         super().__init__(alphabetic)
-        self.validate("({0})+".format(self.regex))
+        self._validate()
 
-    def prepare(self):
+    def _prepare(self):
         "Prepare the Cyrillic number for conversion."
 
-        if super().prepare():
-            self.alphabetic = re.sub(
-                "[{0}\.]".format(self.dict.get("TITLO")), "", self.alphabetic
+        if super()._prepare():
+            self._alphabetic = re.sub(
+                "[{0}\.]".format(self._dict.get("TITLO")), "", self._alphabetic
             )  # Strip ҃"҃ " and dots
             return self
 
     @classmethod
-    def calculateMultiplier(cls, index, input):
+    def _calculateMultiplier(cls, index, input):
         "Calculate multiplier for adjusting digit group value to its registry."
 
         multiplier = (
-            re.match("({0}*)".format(cls.dict.get("THOUSAND")), input)
+            re.match("({0}*)".format(cls._dict.get("THOUSAND")), input)
             .groups()[0]
-            .count(cls.dict.get("THOUSAND"))
+            .count(cls._dict.get("THOUSAND"))
         )  # Count trailing thousand marks in the group
         multiplier = pow(1000, multiplier if multiplier else index - 1)
         # Use thousand marks if present, otherwise use group index
         return multiplier
 
-    def translateGroups(self):
+    def _translateGroups(self):
         "Translate the alphabetic number per group."
 
-        for i, k in enumerate(self.groups):
+        for i, k in enumerate(self._groups):
 
-            multiplier = self.calculateMultiplier(i, k)
-            k = re.sub(self.dict.get("THOUSAND"), "", k)  # Strip thousand marks
-            self.arabic += self.translate(k) * multiplier
+            multiplier = self._calculateMultiplier(i, k)
+            k = re.sub(self._dict.get("THOUSAND"), "", k)  # Strip thousand marks
+            self._arabic += self._translate(k) * multiplier
 
         return self
 
-    def breakIntoGroups(self, regex):
+    def _breakIntoGroups(self):
         "Break the Cyrillic number in groups of 1-3 digits."
 
-        self.groups = re.split(regex, self.alphabetic)  # Break into groups
-        for i, k in enumerate(self.groups):
-            self.groups.pop(i) if not k else True  # Purge empty groups
-        self.groups.reverse()  # Reverse groups (to ascending order)
+        self._groups = re.split(self._regex, self._alphabetic)  # Break into groups
+        for i, k in enumerate(self._groups):
+            self._groups.pop(i) if not k else True  # Purge empty groups
+        self._groups.reverse()  # Reverse groups (to ascending order)
 
         return self
 
     def convert(self):
-        "Convert the Cyrillic number to Arabic."
+        """
+        Convert a Cyrillic number into Arabic numeral system.
 
-        return self.breakIntoGroups("({0})".format(self.regex)).translateGroups().get()
+        Requires a non-empty string.
+        """
 
-
-def to_alphabetic(input, flags=0):
-    """
-    Convert an Arabic number into Cyrillic numeral system. Uses plain style by default.
-
-    Requires a non-zero integer.
-    """
-
-    if isinstance(input, int, "Non-zero integer required, got {0}"):
-        return ArabicNumber(input, flags).convert()
+        if super()._convert():
+            return self._breakIntoGroups()._translateGroups()._get()
 
 
-to_cu = to_alphabetic
+def to_cu(integer, flags=0):
+    "Deprecated; use ArabicNumber().convert() instead."
+
+    return ArabicNumber(integer, flags).convert()
 
 
-def to_arabic(input, flags=0):
-    """
-    Convert a Cyrillic number into Arabic numeral system.
+def to_arab(alphabetic, flags=0):
+    "Deprecated; use CyrillicNumber().convert() instead."
 
-    Requires a non-empty string.
-    """
-
-    if isinstance(input, str, "Non-empty string required, got {0}"):
-        return CyrillicNumber(input).convert()
-
-
-to_arab = to_arabic
+    return CyrillicNumber(alphabetic).convert()
