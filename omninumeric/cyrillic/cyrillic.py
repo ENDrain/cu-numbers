@@ -126,20 +126,19 @@ class ArabicNumber(ArabicNumberConverterGreek):
         Requires a non-zero integer.
         """
 
-        if super().convert():
-            return (
-                self._breakIntoGroups()
-                ._ambiguityCheck(self._hasFlag(CU_DELIM), CU_DOT)
-                ._translateGroups()
-                ._appendThousandMarks(self._hasFlag(CU_DELIM))
-                ._purgeEmptyGroups()
-                ._swapDigits()
-                ._delimDots(self._hasFlag(CU_DOT))
-                ._build()
-                ._appendTitlo(self._hasFlag(CU_NOTITLO))
-                ._wrapDot(self._hasFlag(CU_PREDOT), self._hasFlag(CU_ENDDOT))
-                ._get()
-            )
+        return (
+            self._breakIntoGroups()
+            ._ambiguityCheck(self._hasFlag(CU_DELIM), CU_DOT)
+            ._translateGroups()
+            ._appendThousandMarks(self._hasFlag(CU_DELIM))
+            ._purgeEmptyGroups()
+            ._swapDigits()
+            ._delimDots(self._hasFlag(CU_DOT))
+            ._build()
+            ._appendTitlo(self._hasFlag(CU_NOTITLO))
+            ._wrapDot(self._hasFlag(CU_PREDOT), self._hasFlag(CU_ENDDOT))
+            ._get()
+        )
 
 
 class CyrillicNumber(AlphabeticNumberConverterGreek):
@@ -168,10 +167,6 @@ class CyrillicNumber(AlphabeticNumberConverterGreek):
 
         super()._validate("{0}+".format(self._regex))
 
-    def __init__(self, alphabetic):
-        super().__init__(alphabetic)
-        self._prepare()._validate()
-
     def _breakIntoGroups(self):
         return super()._breakIntoGroups(self._regex)
 
@@ -182,8 +177,7 @@ class CyrillicNumber(AlphabeticNumberConverterGreek):
         Requires a non-empty string.
         """
 
-        if super().convert():
-            return self._breakIntoGroups()._translateGroups()._get()
+        return self._breakIntoGroups()._translateGroups()._get()
 
 
 def to_cu(integer, flags=0):

@@ -54,16 +54,14 @@ class ArabicNumber(ArabicNumberConverterGreek):
 
         Requires a non-zero integer.
         """
-
-        if super().convert():
-            return (
-                self._breakIntoGroups()
-                ._translateGroups()
-                ._appendThousandMarks(self._hasFlag(DELIM))
-                ._purgeEmptyGroups()
-                ._build()
-                ._get()
-            )
+        return (
+            self._breakIntoGroups()
+            ._translateGroups()
+            ._appendThousandMarks(self._hasFlag(DELIM))
+            ._purgeEmptyGroups()
+            ._build()
+            ._get()
+        )
 
 
 class OldGreekNumber(AlphabeticNumberConverterGreek):
@@ -77,5 +75,4 @@ class OldGreekNumber(AlphabeticNumberConverterGreek):
         Requires a non-empty string.
         """
 
-        if super().convert():
-            return self._breakIntoGroups()._translateGroups()._get()
+        return self._breakIntoGroups()._translateGroups()._get()

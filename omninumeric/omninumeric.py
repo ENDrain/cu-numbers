@@ -5,12 +5,10 @@ import re
 from enum import Enum, unique
 
 
-def isinstance(value, condition, msg):
+def isinstance(value, cond, msg):
 
     t = type(value)
-    if t == condition:
-        return True
-    else:
+    if not t == cond:
         raise TypeError(msg.format(t))
 
 
@@ -41,15 +39,16 @@ class NumberConverter:
         return self._flags & flag
         # return False if self._flags & flag == 0 else True
 
-    def convert(self, value, condition, msg):
+    def convert(self):
 
-        if isinstance(value, condition, msg):
-            return NotImplemented
+        return NotImplemented
 
 
 class ArabicNumberConverter(NumberConverter):
     def _validate(self):
         "Validate that input is a natural Arabic number."
+
+        isinstance(self._arabic, int, "Non-zero integer required, got {0}")
 
         if self._arabic <= 0:
             raise ValueError("Natural number integer required")
@@ -68,10 +67,6 @@ class ArabicNumberConverter(NumberConverter):
 
         return self._alphabetic
 
-    def convert(self):
-        if super().convert(self._arabic, int, "Non-zero integer required, got {0}"):
-            return NotImplemented
-
 
 class AlphabeticNumberConverter(NumberConverter):
 
@@ -89,6 +84,8 @@ class AlphabeticNumberConverter(NumberConverter):
     def _validate(self, regex=""):
         "Validate that input is a alphabetic number in appropriate writing system."
 
+        isinstance(self._alphabetic, str, "Non-empty string required, got {0}")
+
         if re.fullmatch(regex, self._alphabetic):
             return NotImplemented
         else:
@@ -102,8 +99,7 @@ class AlphabeticNumberConverter(NumberConverter):
         self._alphabetic = alphabetic
         self._arabic = 0
         self._groups = []
-        self._prepare()
-        return NotImplemented
+        self._prepare()._validate()
 
     def _get(self):
         "Return the Arabic number representation."
@@ -118,8 +114,3 @@ class AlphabeticNumberConverter(NumberConverter):
             total += cls._dict.get(k)
 
         return total
-
-    def convert(self):
-
-        if super().convert(self._alphabetic, str, "Non-empty string required, got {0}"):
-            return NotImplemented
