@@ -6,6 +6,7 @@ from enum import Enum, unique
 
 
 def isinstance(value, condition, msg):
+
     t = type(value)
     if t == condition:
         return True
@@ -29,7 +30,19 @@ class Dictionary(Enum):
 class NumberConverter:
     _dict = NotImplemented
 
+    def __init__(self, value=0, flags=0):
+
+        self._flags = flags
+        return NotImplemented
+
+    def _hasFlag(self, flag):
+        "Check if a flag is set."
+
+        return self._flags & flag
+        # return False if self._flags & flag == 0 else True
+
     def convert(self, value, condition, msg):
+
         if isinstance(value, condition, msg):
             return NotImplemented
 
@@ -43,9 +56,10 @@ class ArabicNumberConverter(NumberConverter):
         return self
 
     def __init__(self, value, flags=0):
+
+        super().__init__(value, flags)
         self._alphabetic = ""
         self._arabic = value
-        self._flags = flags
         self._groups = []
         self._validate()
 
@@ -53,12 +67,6 @@ class ArabicNumberConverter(NumberConverter):
         "Return the alphabetic number representation."
 
         return self._alphabetic
-
-    def _hasFlag(self, flag):
-        "Check if a flag is set."
-
-        return self._flags & flag
-        # return False if self._flags & flag == 0 else True
 
     def convert(self):
         if super().convert(self._arabic, int, "Non-zero integer required, got {0}"):
@@ -88,8 +96,9 @@ class AlphabeticNumberConverter(NumberConverter):
                 "String does not match any pattern for Cyrillic numeral system number"
             )
 
-    def __init__(self, alphabetic):
+    def __init__(self, alphabetic, flags=0):
 
+        super().__init__(alphabetic, flags)
         self._alphabetic = alphabetic
         self._arabic = 0
         self._groups = []
@@ -111,5 +120,6 @@ class AlphabeticNumberConverter(NumberConverter):
         return total
 
     def convert(self):
+
         if super().convert(self._alphabetic, str, "Non-empty string required, got {0}"):
             return NotImplemented
