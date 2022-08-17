@@ -28,10 +28,12 @@ class Dictionary(Enum):
 class NumberConverter:
     _dict = NotImplemented
 
-    def __init__(self, value=0, flags=0):
+    def __init__(self, flags=0):
 
+        self._arabic = 0
+        self._alphabetic = ""
         self._flags = flags
-        return NotImplemented
+        self._groups = []
 
     def _hasFlag(self, flag):
         "Check if a flag is set."
@@ -40,71 +42,56 @@ class NumberConverter:
         # return False if self._flags & flag == 0 else True
 
     def convert(self):
-
-        return NotImplemented
+        raise NotImplementedError
 
 
 class ArabicNumberConverter(NumberConverter):
-    def _validate(self):
-        "Validate that input is a natural Arabic number."
-
-        isinstance(self._arabic, int, "Non-zero integer required, got {0}")
-
-        if self._arabic <= 0:
-            raise ValueError("Natural number integer required")
-        return self
-
     def __init__(self, value, flags=0):
 
-        super().__init__(value, flags)
-        self._alphabetic = ""
+        super().__init__(flags)
         self._arabic = value
-        self._groups = []
-        self._validate()
 
     def _get(self):
         "Return the alphabetic number representation."
 
         return self._alphabetic
 
+    def _validate(self):
+        "Validate that input is a natural Arabic number."
+
+        isinstance(self._arabic, int, "Integer required, got {0}")
+
+        if self._arabic <= 0:
+            raise ValueError("Natural number required")
+
+        return self
+
 
 class AlphabeticNumberConverter(NumberConverter):
-
-    _regex = NotImplemented
-
-    def _prepare(self):
-        "Prepare the alphabetic number for conversion."
-
-        if self._alphabetic:
-            self._alphabetic = str.lower(str.strip(self._alphabetic))
-            return self
-        else:
-            raise ValueError("Non-empty string required")
-
-    def _validate(self, regex=""):
-        "Validate that input is a alphabetic number in appropriate writing system."
-
-        isinstance(self._alphabetic, str, "Non-empty string required, got {0}")
-
-        if re.fullmatch(regex, self._alphabetic):
-            return NotImplemented
-        else:
-            raise ValueError(
-                "String does not match any pattern for Cyrillic numeral system number"
-            )
-
     def __init__(self, alphabetic, flags=0):
 
-        super().__init__(alphabetic, flags)
+        super().__init__(flags)
         self._alphabetic = alphabetic
-        self._arabic = 0
-        self._groups = []
-        self._prepare()._validate()
 
     def _get(self):
         "Return the Arabic number representation."
 
         return self._arabic
+
+    def _validate(self):
+        "Validate that input is a alphabetic number in appropriate writing system."
+
+        isinstance(self._alphabetic, str, "String required, got {0}")
+
+        if not self._alphabetic:
+            raise ValueError("Non-empty string required")
+
+        return self
+
+    def _prepare(self):
+        "Prepare the alphabetic number for conversion."
+
+        self._alphabetic = str.lower(str.strip(self._alphabetic))
 
     @classmethod
     def _translate(cls, alphabetic):

@@ -127,7 +127,8 @@ class ArabicNumber(ArabicNumberConverterGreek):
         """
 
         return (
-            self._breakIntoGroups()
+            self._validate()
+            ._breakIntoGroups()
             ._ambiguityCheck(self._hasFlag(CU_DELIM), CU_DOT)
             ._translateGroups()
             ._appendThousandMarks(self._hasFlag(CU_DELIM))
@@ -156,16 +157,24 @@ class CyrillicNumber(AlphabeticNumberConverterGreek):
     def _prepare(self):
         "Prepare the Cyrillic number for conversion."
 
-        if super()._prepare():
-            self._alphabetic = re.sub(
-                "[{0}\.]".format(self._dict.get("TITLO")), "", self._alphabetic
-            )  # Strip ҃"҃ " and dots
-            return self
+        super()._prepare()
+        self._alphabetic = re.sub(
+            "[{0}\{1}]".format(self._dict.get("TITLO"), self._dict.get("DOT")),
+            "",
+            self._alphabetic,
+        )  # Strip ҃decorators
+
+        return self
 
     def _validate(self):
-        "Validate that input is a Cyrillic number."
 
-        super()._validate("{0}+".format(self._regex))
+        super()._validate()
+        if not re.fullmatch("{0}+".format(self._regex), self._alphabetic):
+            raise ValueError(
+                "String does not match any pattern for Cyrillic numeral system number"
+            )
+
+        return self
 
     def _breakIntoGroups(self):
         return super()._breakIntoGroups(self._regex)
@@ -177,7 +186,7 @@ class CyrillicNumber(AlphabeticNumberConverterGreek):
         Requires a non-empty string.
         """
 
-        return self._breakIntoGroups()._translateGroups()._get()
+        return self._prepare()._validate()._breakIntoGroups()._translateGroups()._get()
 
 
 def to_cu(integer, flags=0):
