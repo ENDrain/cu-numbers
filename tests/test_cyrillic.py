@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import unittest
-from cunumbers.cunumbers import *
+from omninumeric.cyrillic import *
 
 
 class ToCUPlainTestCase(unittest.TestCase):

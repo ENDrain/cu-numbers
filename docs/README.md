@@ -1,4 +1,4 @@
-# cu-numbers
+# Omninumeric
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cu-numbers) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/cu-numbers) [![Codecov](https://img.shields.io/codecov/c/github/endrain/cu-numbers)](https://app.codecov.io/gh/endrain/cu-numbers)
 
