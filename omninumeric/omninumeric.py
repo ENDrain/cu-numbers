@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included in the project's root directory.
 
+import re
 from enum import Enum, unique
 
 
@@ -12,6 +13,7 @@ def isinstance(value, condition, msg):
         raise TypeError(msg.format(t))
 
 
+@unique
 class Dictionary(Enum):
     @classmethod
     def get(cls, input):
@@ -24,46 +26,28 @@ class Dictionary(Enum):
                 return ""
 
 
-class GreekTypeDictionary(Dictionary):
-    @classmethod
-    def _getmany(cls, start=1, end=10, step=1):
-        r = ""
-        for i in range(start * step, end * step, step):
-            r += cls(i).name
-        return r
-
-    @classmethod
-    def digits(cls, start=1, end=10):
-        return cls._getmany(start, end, 1)
-
-    @classmethod
-    def tens(cls, start=1, end=10):
-        return cls._getmany(start, end, 10)
-
-    @classmethod
-    def hundreds(cls, start=1, end=10):
-        return cls._getmany(start, end, 100)
-
-
 class NumberConverter:
-    def _convert(self, value, condition, msg):
+    _dict = NotImplemented
+
+    def convert(self, value, condition, msg):
         if isinstance(value, condition, msg):
-            return self
+            return NotImplemented
 
 
 class ArabicNumberConverter(NumberConverter):
-    def _prepare(self):
-        "Prepare the Arabic number for conversion."
+    def _validate(self):
+        "Validate that input is a natural Arabic number."
 
         if self._arabic <= 0:
-            raise ValueError("Non-zero integer required")
+            raise ValueError("Natural number integer required")
+        return self
 
     def __init__(self, value, flags=0):
         self._alphabetic = ""
         self._arabic = value
         self._flags = flags
         self._groups = []
-        self._prepare()
+        self._validate()
 
     def _get(self):
         "Return the alphabetic number representation."
@@ -76,14 +60,14 @@ class ArabicNumberConverter(NumberConverter):
         return self._flags & flag
         # return False if self._flags & flag == 0 else True
 
-    def _convert(self):
-        if super()._convert(self._arabic, int, "Non-zero integer required, got {0}"):
-            return self
+    def convert(self):
+        if super().convert(self._arabic, int, "Non-zero integer required, got {0}"):
+            return NotImplemented
 
 
 class AlphabeticNumberConverter(NumberConverter):
 
-    _dict = Dictionary
+    _regex = NotImplemented
 
     def _prepare(self):
         "Prepare the alphabetic number for conversion."
@@ -94,12 +78,23 @@ class AlphabeticNumberConverter(NumberConverter):
         else:
             raise ValueError("Non-empty string required")
 
+    def _validate(self, regex=""):
+        "Validate that input is a alphabetic number in appropriate writing system."
+
+        if re.fullmatch(regex, self._alphabetic):
+            return NotImplemented
+        else:
+            raise ValueError(
+                "String does not match any pattern for Cyrillic numeral system number"
+            )
+
     def __init__(self, alphabetic):
 
         self._alphabetic = alphabetic
         self._arabic = 0
         self._groups = []
         self._prepare()
+        return NotImplemented
 
     def _get(self):
         "Return the Arabic number representation."
@@ -115,8 +110,6 @@ class AlphabeticNumberConverter(NumberConverter):
 
         return total
 
-    def _convert(self):
-        if super()._convert(
-            self._alphabetic, str, "Non-empty string required, got {0}"
-        ):
-            return self
+    def convert(self):
+        if super().convert(self._alphabetic, str, "Non-empty string required, got {0}"):
+            return NotImplemented
