@@ -41,6 +41,16 @@ class NumberConverter:
         return self._flags & flag
         # return False if self._flags & flag == 0 else True
 
+    def _purgeEmptyGroups(self):
+        "Remove empty groups from digit group collection."
+
+        for i, k in enumerate(self._groups):
+
+            if not k:
+                self._groups.pop(i)  # Purge empty groups
+
+        return self
+
     def convert(self):
         raise NotImplementedError
 

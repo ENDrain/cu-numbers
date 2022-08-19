@@ -43,16 +43,6 @@ class ArabicNumberConverterGreek(ArabicNumberConverter):
             self._alphabetic = "{0}{1}".format(k, self._alphabetic)
         return self
 
-    def _purgeEmptyGroups(self):
-        "Remove empty groups from digit group collection."
-
-        for i, k in enumerate(self._groups):
-
-            if not k:
-                self._groups.pop(i)
-
-        return self
-
     @classmethod
     def _appendThousandMarksDelim(cls, input, index):
         "Append thousand marks in delimeter style."
@@ -157,8 +147,6 @@ class AlphabeticNumberConverterGreek(AlphabeticNumberConverter):
         "Break the Cyrillic number in groups of 1-3 digits."
 
         self._groups = re.split(regex, self._alphabetic)  # Break into groups
-        for i, k in enumerate(self._groups):
-            self._groups.pop(i) if not k else True  # Purge empty groups
         self._groups.reverse()  # Reverse groups (to ascending order)
 
         return self

@@ -75,4 +75,4 @@ class OldGreekNumber(AlphabeticNumberConverterGreek):
         Requires a non-empty string.
         """
 
-        return self._breakIntoGroups()._translateGroups()._get()
+        return self._breakIntoGroups()._purgeEmptyGroups()._translateGroups()._get()

@@ -186,7 +186,14 @@ class CyrillicNumber(AlphabeticNumberConverterGreek):
         Requires a non-empty string.
         """
 
-        return self._prepare()._validate()._breakIntoGroups()._translateGroups()._get()
+        return (
+            self._prepare()
+            ._validate()
+            ._breakIntoGroups()
+            ._purgeEmptyGroups()
+            ._translateGroups()
+            ._get()
+        )
 
 
 def to_cu(integer, flags=0):
