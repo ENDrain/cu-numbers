@@ -43,36 +43,24 @@ class ArabicNumberConverterGreek(ArabicNumberConverter):
             self._alphabetic = "{0}{1}".format(k, self._alphabetic)
         return self
 
-    @classmethod
-    def _appendThousandMarksDelim(cls, input, index):
-        "Append thousand marks in delimeter style."
-
-        if input:
-            return "{0}{1}".format(cls._dict.get("THOUSAND") * index, input)
-        else:
-            return ""
-
-    @classmethod
-    def _appendThousandMarksPlain(cls, input, index):
-        "Append thousand marks in plain style."
-
-        result = ""
-
-        for i in input:
-            result = "{0}{1}".format(result, cls._appendThousandMarksDelim(i, index))
-
-        return result
-
     def _appendThousandMarks(self, cond):
         "Append thousand marks according to chosen style (plain or delimeter)."
 
-        method = (
-            self._appendThousandMarksDelim if cond else self._appendThousandMarksPlain
-        )
-
         for i, k in enumerate(self._groups):
 
-            self._groups[i] = method(self._groups[i], i)
+            if k:
+                if cond:
+                    result = "{0}{1}".format(self._dict.get("THOUSAND") * i, k)
+
+                else:
+                    result = ""
+
+                    for l in k:
+                        result = "{0}{1}{2}".format(
+                            result, self._dict.get("THOUSAND") * i, l
+                        )
+
+                self._groups[i] = result
 
         return self
 
