@@ -18,20 +18,20 @@ class DictionaryGreek(Dictionary):
     @classmethod
     def _getmany(cls, start=1, end=10, step=1):
         r = ""
-        for i in range(start * step, end * step, step):
+        for i in range(start * step, (end + 1) * step, step):
             r += cls(i).name
         return r
 
     @classmethod
-    def digits(cls, start=1, end=10):
+    def digits(cls, start=1, end=9):
         return cls._getmany(start, end, 1)
 
     @classmethod
-    def tens(cls, start=1, end=10):
+    def tens(cls, start=1, end=9):
         return cls._getmany(start, end, 10)
 
     @classmethod
-    def hundreds(cls, start=1, end=10):
+    def hundreds(cls, start=1, end=9):
         return cls._getmany(start, end, 100)
 
 
