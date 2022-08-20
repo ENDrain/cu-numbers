@@ -1,11 +1,19 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included in the project's root directory.
+"This module provides basic tools for two-way conversion with alphabetic numeral systems."
 
 import re
 from enum import Enum, unique
 
 
 def isinstanceEx(value, cond, msg=""):
+    """
+    Test if value is of a speciic type, raise error with specified message if not.
+
+    @value - value to test
+    @cond - type to test against
+    @msg - error message to print. Supports format() to print @value type
+    """
 
     t = type(value)
     if not t == cond:
@@ -14,8 +22,19 @@ def isinstanceEx(value, cond, msg=""):
 
 @unique
 class Dictionary(Enum):
+    """
+    ABC for alphabetic numeral systems dictionaries.
+
+    Derive from this class to define numeral dictionaries for alphabetic numeral systems.
+    """
+
     @classmethod
     def get(cls, numeral):
+        """
+        Look a numeral up in dictionary.
+
+        @numeral - str or int to look up. Returns int if str is found and vice versa, returns None if nothing found
+        """
 
         try:
             return cls[numeral].value
@@ -27,6 +46,12 @@ class Dictionary(Enum):
 
 
 class NumberConverter:
+    """
+    ABC for number conversion.
+
+    Derive from this class to define converters into and from alphabetic numeral systems.
+    """
+
     _dict = NotImplemented
 
     def __init__(self, source, target, flags=0):
@@ -47,7 +72,7 @@ class NumberConverter:
         return self._target
 
     def _build(self):
-        "Build target number from digit groups."
+        "Build the converted number from groups of numerals."
 
         for k in self._groups:
             self._target = k + self._target
@@ -55,12 +80,17 @@ class NumberConverter:
 
     @classmethod
     def _getNumeral(cls, numeral, fallback):
-        "Get a numeral or its value from dictionary."
+        """
+        Look a numeral up in dictionary.
+
+        @numeral - numeral to look up
+        @fallback - value to return if @numeral is not found
+        """
 
         return cls._dict.get(numeral) or fallback
 
     def _purgeEmptyGroups(self):
-        "Remove empty groups from digit group collection."
+        "Remove empty groups from numeral groups collection."
 
         for i, k in enumerate(self._groups):
 
@@ -74,11 +104,17 @@ class NumberConverter:
 
 
 class IntNumberConverter(NumberConverter):
+    """
+    ABC for number conversion into alphabetic numeral systems.
+
+    Derive from this class to define converters into alphabetic numeral systems.
+    """
+
     def __init__(self, value, flags=0):
         super().__init__(value, "", flags)
 
     def _validate(self):
-        "Validate that input is a natural Arabic number."
+        "Validate that source number is a natural number."
 
         isinstanceEx(self._source, int, "Integer required, got {0}")
 
@@ -89,17 +125,23 @@ class IntNumberConverter(NumberConverter):
 
     @classmethod
     def _getNumeral(cls, numeral):
-        "Get alphabetical digit for given Arabic digit."
+        "Get alphabetic digit for given value."
 
         return super()._getNumeral(numeral, "")
 
 
 class StrNumberConverter(NumberConverter):
+    """
+    ABC for number conversion from alphabetic numeral systems.
+
+    Derive from this class to define converters from ABS.
+    """
+
     def __init__(self, alphabetic, flags=0):
         super().__init__(alphabetic, 0, flags)
 
     def _validate(self):
-        "Validate that input is a alphabetic number in appropriate writing system."
+        "Validate that source number is a non-empty string."
 
         isinstanceEx(self._source, str, "String required, got {0}")
 
@@ -109,13 +151,13 @@ class StrNumberConverter(NumberConverter):
         return self
 
     def _prepare(self):
-        "Prepare the alphabetic number for conversion."
+        "Prepare source number for further operations."
 
         self._source = str.lower(str.strip(self._source))
         return self
 
     @classmethod
     def _getNumeral(cls, numeral):
-        "Get alphabetical digit for given Arabic digit."
+        "Get value for given alphabetic digit."
 
         return super()._getNumeral(numeral, 0)

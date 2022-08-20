@@ -1,5 +1,10 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included in the project's root directory.
+"""
+This module provides tools for two-way conversion with Old Greek numeral system.
+
+WIP
+"""
 
 
 from omninumeric import (
@@ -10,6 +15,7 @@ from omninumeric.greek import *
 
 
 class _OldGreekDictionary(DictionaryGreek):
+    "Old Greek numerals dictionary"
 
     α = 1
     β = 2
@@ -38,19 +44,20 @@ class _OldGreekDictionary(DictionaryGreek):
     ψ = 700
     ω = 800
     ϡ = 900
-    THOUSAND = "͵"  # Thousand mark
+    THOUSAND = "͵"  # "Thousand" mark
     KERAIA = "ʹ"  # "Keraia" decorator
     OVERLINE = "̅"  # Overline decorator
     DOT = "."  # Dot decorator
 
 
 class ArabicNumber(IntNumberConverterGreek):
+    "Number converter into Old Greek numeral system."
 
     _dict = _OldGreekDictionary
 
     def convert(self):
         """
-        Convert an Arabic number into Cyrillic numeral system. Uses plain style by default.
+        Convert into Old Greek numeral system. Uses plain style by default.
 
         Requires a non-zero integer.
         """
@@ -65,12 +72,13 @@ class ArabicNumber(IntNumberConverterGreek):
 
 
 class OldGreekNumber(StrNumberConverterGreek):
+    "Number converter from Old Greek numeral system."
 
     _dict = _OldGreekDictionary
 
     def convert(self):
         """
-        Convert a Cyrillic number into Arabic numeral system.
+        Convert from Old Greek numeral system.
 
         Requires a non-empty string.
         """

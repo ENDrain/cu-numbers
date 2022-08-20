@@ -1,24 +1,25 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included in the project's root directory.
 # To learn about Cyrillic numeral system (CU), see INTRODUCTION.md
-"Module for number conversion between Arabic and Cyrillic numeral systems."
+"This module provides tools for two-way conversion with Cyrillic numeral system."
 
 import re
 from omninumeric.greek import *
 
 
-CU_PLAIN = PLAIN
-CU_DELIM = DELIM
-CU_NOTITLO = 0b10  # DO NOT append titlo
-CU_ENDDOT = 0b100  # Append dot
-CU_PREDOT = 0b1000  # Prepend dot
-CU_DOT = 0b10000  # Delimeter dots (private, for internal flag checks)
-CU_DELIMDOT = CU_DOT | CU_DELIM  # Delimeter dots (forces delim style)
-CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots
-CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots
+CU_PLAIN = PLAIN  # Write in plain style flag
+CU_DELIM = DELIM  # Read/write in delim style flag
+CU_NOTITLO = 0b10  # DO NOT append titlo flag
+CU_ENDDOT = 0b100  # Append dot flag
+CU_PREDOT = 0b1000  # Prepend dot flag
+CU_DOT = 0b10000  # Delimeter dots flag
+CU_DELIMDOT = CU_DOT | CU_DELIM  # Delimeter dots flag (forces delim style)
+CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots flag
+CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots flag
 
 
 class _CyrillicDictionary(DictionaryGreek):
+    "Cyrillic numerals ditcionary."
 
     а = 1
     в = 2
@@ -53,6 +54,8 @@ class _CyrillicDictionary(DictionaryGreek):
 
 
 class ArabicNumber(IntNumberConverterGreek):
+    "Number converter into Cyrillic numeral system."
+
     _dict = _CyrillicDictionary
 
     def _ambiguityCheck(self, cond, flag):
@@ -68,7 +71,7 @@ class ArabicNumber(IntNumberConverterGreek):
             return self
 
     def _swapDigits(self):
-        "Swap digits in 11-19."
+        "Swap digits for values 11-19 (unless separated)."
 
         for i, k in enumerate(self._groups):
 
@@ -81,7 +84,7 @@ class ArabicNumber(IntNumberConverterGreek):
         return self
 
     def _appendTitlo(self, cond):
-        "Append titlo unless appropriate flag is set."
+        'Apply "titlo" decorator unless appropriate flag is set.'
 
         if not cond:
             result = re.subn(
@@ -100,7 +103,7 @@ class ArabicNumber(IntNumberConverterGreek):
         return self
 
     def _delimDots(self, cond):
-        "Insert dots between digit groups if appropriate flag is set."
+        "Insert dots between numeral groups if appropriate flag is set."
 
         if cond:
             for i, k in enumerate(self._groups[1:]):
@@ -109,7 +112,7 @@ class ArabicNumber(IntNumberConverterGreek):
         return self
 
     def _wrapDot(self, cond_a, cond_b):
-        "Prepend and/or append dots if appropriate flags are set."
+        "Prepend and/or append a dot if appropriate flags are set."
 
         self._target = "{0}{1}{2}".format(
             self._dict.get("DOT") if cond_a else "",
@@ -121,7 +124,7 @@ class ArabicNumber(IntNumberConverterGreek):
 
     def convert(self):
         """
-        Convert an Arabic number into Cyrillic numeral system. Uses plain style by default.
+        Convert into Cyrillic numeral system. Uses plain style by default.
 
         Requires a non-zero integer.
         """
@@ -143,6 +146,7 @@ class ArabicNumber(IntNumberConverterGreek):
 
 
 class CyrillicNumber(StrNumberConverterGreek):
+    "Number converter from Cyrillic numeral system."
 
     _dict = _CyrillicDictionary
 
@@ -152,10 +156,10 @@ class CyrillicNumber(StrNumberConverterGreek):
         _dict.tens(2),
         _dict.digits(),
         _dict.get(10),
-    )
+    )  # Regular expression for typical Cyrillic numeral system number
 
     def _prepare(self):
-        "Prepare the Cyrillic number for conversion."
+        "Prepare source number for conversion."
 
         super()._prepare()
         self._source = re.sub(
@@ -167,18 +171,19 @@ class CyrillicNumber(StrNumberConverterGreek):
         return self
 
     def _validate(self):
+        "Validate that source number is a non-empty string and matches the pattern for Cyrillic numeral system numbers."
 
         super()._validate()
         if not re.fullmatch("{0}+".format(self._regex), self._source):
             raise ValueError(
-                "String does not match any pattern for Cyrillic numeral system number"
+                "String does not match any pattern for Cyrillic numeral system numbers"
             )
 
         return self
 
     def convert(self):
         """
-        Convert a Cyrillic number into Arabic numeral system.
+        Convert from Cyrillic numeral system.
 
         Requires a non-empty string.
         """
@@ -195,12 +200,12 @@ class CyrillicNumber(StrNumberConverterGreek):
 
 
 def to_cu(integer, flags=0):
-    "Deprecated; use ArabicNumber().convert() instead."
+    "Deprecated. Use ArabicNumber().convert() instead."
 
     return ArabicNumber(integer, flags).convert()
 
 
 def to_arab(alphabetic, flags=0):
-    "Deprecated; use CyrillicNumber().convert() instead."
+    "Deprecated. Use CyrillicNumber().convert() instead."
 
     return CyrillicNumber(alphabetic).convert()

@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included in the project's root directory.
+"This module provides basic tools for two-way conversion with Greek-type alphabetic numeral systems."
 
 import re
 
@@ -10,13 +11,27 @@ from omninumeric import (
 )
 
 
-PLAIN = 0  # Write in plain style
-DELIM = 0b1  # Read/write in delim style
+PLAIN = 0  # Write in plain style flag
+DELIM = 0b1  # Read/write in delim style flag
 
 
 class DictionaryGreek(Dictionary):
+    """
+    ABC for Greek-type alphabetic numeral systems ditcionaries.
+
+    Derive from this class to define numeral dictionaries for Greek type alphabetic numeral systems.
+    """
+
     @classmethod
     def _getmany(cls, start=1, end=10, step=1):
+        """
+        Look a range of numerals up in dictionary.
+
+        @start - starting numeral value (i.e. 5 for range of 5, 6, 7...)
+        @end - ending numeral value (i.e. 5 for range of ...3, 4, 5)
+        step - numeral value increment (i.e. 1 for range of 1, 2, 3...; 10 for range of 10, 20, 30...)
+        """
+
         r = ""
         for i in range(start * step, (end + 1) * step, step):
             r += cls(i).name
@@ -24,18 +39,42 @@ class DictionaryGreek(Dictionary):
 
     @classmethod
     def digits(cls, start=1, end=9):
+        """
+        Get a range of numerals in digits registry.
+
+        @start - starting numeral value (i.e. 5 for range of 5, 6, 7...)
+        @end - ending numeral value (i.e. 5 for range of ...3, 4, 5)
+        """
         return cls._getmany(start, end, 1)
 
     @classmethod
     def tens(cls, start=1, end=9):
+        """
+        Get a range of numerals in tens registry.
+
+        @start - starting numeral value (i.e. 5 for range of 50, 60, 70...)
+        @end - ending numeral value (i.e. 5 for range of ...30, 40, 50)
+        """
         return cls._getmany(start, end, 10)
 
     @classmethod
     def hundreds(cls, start=1, end=9):
+        """
+        Get a range of numerals in hundreds registry.
+
+        @start - starting numeral value (i.e. 5 for range of 500, 600, 700...)
+        @end - ending numeral value (i.e. 5 for range of ...300, 400, 500)
+        """
         return cls._getmany(start, end, 100)
 
 
 class IntNumberConverterGreek(IntNumberConverter):
+    """
+    ABC for number conversion into Greek-type alphabetic numeral systems.
+
+    Derive from this class to define converters into Greek-type alphabetic numeral systems.
+    """
+
     def _appendThousandMarks(self, cond):
         "Append thousand marks according to chosen style (plain or delimeter)."
 
@@ -57,13 +96,8 @@ class IntNumberConverterGreek(IntNumberConverter):
 
         return self
 
-    @classmethod
-    def _getDigit(cls, input):
-
-        return cls._dict.get(input) if input else ""
-
     def _translateGroups(self):
-        "Translate the Arabic number per group."
+        "Translate groups of numerals one by one."
 
         for i, k in enumerate(self._groups):
 
@@ -80,7 +114,7 @@ class IntNumberConverterGreek(IntNumberConverter):
         return self
 
     def _breakIntoGroups(self):
-        "Break the Arabic number into groups of 3 digits."
+        "Break source number into groups of 3 numerals."
 
         while self._source > 0:
             self._groups.append(self._source % 1000)
@@ -90,9 +124,15 @@ class IntNumberConverterGreek(IntNumberConverter):
 
 
 class StrNumberConverterGreek(StrNumberConverter):
+    """
+    ABC for number conversion from Greek-type alphabetic numeral systems.
+
+    Derive from this class to define converters from Greek-type alphabetic numeral systems.
+    """
+
     @classmethod
     def _calculateMultiplier(cls, index, group):
-        "Calculate multiplier for adjusting digit group value to its registry."
+        'Calculate multiplier for a numerals group, according to group index or "thousand" marks present in the group.'
 
         multiplier = (
             re.match("({0}*)".format(cls._dict.get("THOUSAND")), group)
@@ -104,7 +144,7 @@ class StrNumberConverterGreek(StrNumberConverter):
         return multiplier
 
     def _translateGroups(self):
-        "Translate the alphabetic number per group."
+        "Translate groups of numerals one by one."
 
         for i, k in enumerate(self._groups):
             total = 0  # Current group total value
@@ -119,7 +159,7 @@ class StrNumberConverterGreek(StrNumberConverter):
         return self
 
     def _breakIntoGroups(self, regex=""):
-        "Break the Cyrillic number in groups of 1-3 digits."
+        "Break source number in groups of 1-3 numerals."
 
         self._groups = re.split(regex, self._source)  # Break into groups
         self._groups.reverse()  # Reverse groups (to ascending order)
