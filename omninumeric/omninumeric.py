@@ -92,3 +92,4 @@ class AlphabeticNumberConverter(NumberConverter):
         "Prepare the alphabetic number for conversion."
 
         self._alphabetic = str.lower(str.strip(self._alphabetic))
+        return self
