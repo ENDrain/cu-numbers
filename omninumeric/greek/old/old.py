@@ -3,8 +3,8 @@
 
 
 from omninumeric import (
-    ArabicNumberConverter,
-    AlphabeticNumberConverter,
+    StrNumberConverter,
+    IntNumberConverter,
 )
 from omninumeric.greek import *
 
@@ -44,7 +44,7 @@ class _OldGreekDictionary(DictionaryGreek):
     DOT = "."  # Dot decorator
 
 
-class ArabicNumber(ArabicNumberConverterGreek):
+class ArabicNumber(IntNumberConverterGreek):
 
     _dict = _OldGreekDictionary
 
@@ -64,7 +64,7 @@ class ArabicNumber(ArabicNumberConverterGreek):
         )
 
 
-class OldGreekNumber(AlphabeticNumberConverterGreek):
+class OldGreekNumber(StrNumberConverterGreek):
 
     _dict = _OldGreekDictionary
 

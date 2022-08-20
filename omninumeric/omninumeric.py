@@ -61,7 +61,7 @@ class NumberConverter:
         raise NotImplementedError
 
 
-class ArabicNumberConverter(NumberConverter):
+class IntNumberConverter(NumberConverter):
     def __init__(self, value, flags=0):
 
         super().__init__(flags)
@@ -89,7 +89,7 @@ class ArabicNumberConverter(NumberConverter):
         return super()._getNumeral(numeral, "")
 
 
-class AlphabeticNumberConverter(NumberConverter):
+class StrNumberConverter(NumberConverter):
     def __init__(self, alphabetic, flags=0):
 
         super().__init__(flags)

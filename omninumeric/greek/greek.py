@@ -5,8 +5,8 @@ import re
 
 from omninumeric import (
     Dictionary,
-    ArabicNumberConverter,
-    AlphabeticNumberConverter,
+    IntNumberConverter,
+    StrNumberConverter,
 )
 
 
@@ -35,7 +35,7 @@ class DictionaryGreek(Dictionary):
         return cls._getmany(start, end, 100)
 
 
-class ArabicNumberConverterGreek(ArabicNumberConverter):
+class IntNumberConverterGreek(IntNumberConverter):
     def _build(self):
         "Build the CU number from digit groups."
 
@@ -96,7 +96,7 @@ class ArabicNumberConverterGreek(ArabicNumberConverter):
         return self
 
 
-class AlphabeticNumberConverterGreek(AlphabeticNumberConverter):
+class StrNumberConverterGreek(StrNumberConverter):
     def _build(self):
         "Build the alphabetical number from digit groups."
 

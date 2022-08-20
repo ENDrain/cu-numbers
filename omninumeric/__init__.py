@@ -1,7 +1,7 @@
 from .omninumeric import (
     Dictionary,
-    ArabicNumberConverter,
-    AlphabeticNumberConverter,
+    IntNumberConverter,
+    StrNumberConverter,
 )
 
-__all__ = ["Dictionary", "ArabicNumberConverter", "AlphabeticNumberConverter"]
+__all__ = ["Dictionary", "IntNumberConverter", "StrNumberConverter"]

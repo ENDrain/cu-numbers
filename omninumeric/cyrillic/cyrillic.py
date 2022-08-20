@@ -52,7 +52,7 @@ class _CyrillicDictionary(DictionaryGreek):
     DOT = "."  # Dot decorator
 
 
-class ArabicNumber(ArabicNumberConverterGreek):
+class ArabicNumber(IntNumberConverterGreek):
     _dict = _CyrillicDictionary
 
     def _ambiguityCheck(self, cond, flag):
@@ -142,7 +142,7 @@ class ArabicNumber(ArabicNumberConverterGreek):
         )
 
 
-class CyrillicNumber(AlphabeticNumberConverterGreek):
+class CyrillicNumber(StrNumberConverterGreek):
 
     _dict = _CyrillicDictionary
 
