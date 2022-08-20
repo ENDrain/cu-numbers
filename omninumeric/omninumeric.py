@@ -41,6 +41,13 @@ class NumberConverter:
         return self._flags & flag
         # return False if self._flags & flag == 0 else True
 
+    def _build(self):
+        "Build target number from digit groups."
+
+        for k in self._groups:
+            self._target = k + self._target
+        return self
+
     @classmethod
     def _getNumeral(cls, numeral, fallback):
         "Get a numeral or its value from dictionary."

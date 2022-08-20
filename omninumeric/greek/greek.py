@@ -36,13 +36,6 @@ class DictionaryGreek(Dictionary):
 
 
 class IntNumberConverterGreek(IntNumberConverter):
-    def _build(self):
-        "Build the CU number from digit groups."
-
-        for k in self._groups:
-            self._target = "{0}{1}".format(k, self._target)
-        return self
-
     def _appendThousandMarks(self, cond):
         "Append thousand marks according to chosen style (plain or delimeter)."
 
@@ -97,13 +90,6 @@ class IntNumberConverterGreek(IntNumberConverter):
 
 
 class StrNumberConverterGreek(StrNumberConverter):
-    def _build(self):
-        "Build the arabic number from digit groups."
-
-        for k in self._groups:
-            self._target += k
-        return self
-
     @classmethod
     def _calculateMultiplier(cls, index, input):
         "Calculate multiplier for adjusting digit group value to its registry."
