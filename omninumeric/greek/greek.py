@@ -97,6 +97,13 @@ class ArabicNumberConverterGreek(ArabicNumberConverter):
 
 
 class AlphabeticNumberConverterGreek(AlphabeticNumberConverter):
+    def _build(self):
+        "Build the alphabetical number from digit groups."
+
+        for k in self._groups:
+            self._arabic += k
+        return self
+
     @classmethod
     def _calculateMultiplier(cls, index, input):
         "Calculate multiplier for adjusting digit group value to its registry."
@@ -121,7 +128,7 @@ class AlphabeticNumberConverterGreek(AlphabeticNumberConverter):
             for l in k:
                 total += self._getNumeral(l)
 
-            self._arabic += total * multiplier
+            self._groups[i] = total * multiplier
 
         return self
 

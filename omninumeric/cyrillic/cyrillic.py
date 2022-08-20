@@ -192,6 +192,7 @@ class CyrillicNumber(AlphabeticNumberConverterGreek):
             ._breakIntoGroups()
             ._purgeEmptyGroups()
             ._translateGroups()
+            ._build()
             ._get()
         )
 
