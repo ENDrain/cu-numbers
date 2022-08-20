@@ -28,10 +28,9 @@ class Dictionary(Enum):
 class NumberConverter:
     _dict = NotImplemented
 
-    def __init__(self, flags=0):
-
-        self._source = 0
-        self._target = ""
+    def __init__(self, source, target, flags=0):
+        self._source = source
+        self._target = target
         self._flags = flags
         self._groups = []
 
@@ -75,15 +74,7 @@ class NumberConverter:
 
 class IntNumberConverter(NumberConverter):
     def __init__(self, value, flags=0):
-
-        super().__init__(flags)
-        self._source = value
-        self._target = ""
-
-    def _get(self):
-        "Return the alphabetic number representation."
-
-        return self._target
+        super().__init__(value, "", flags)
 
     def _validate(self):
         "Validate that input is a natural Arabic number."
@@ -104,15 +95,7 @@ class IntNumberConverter(NumberConverter):
 
 class StrNumberConverter(NumberConverter):
     def __init__(self, alphabetic, flags=0):
-
-        super().__init__(flags)
-        self._source = alphabetic
-        self._target = 0
-
-    def _get(self):
-        "Return the Arabic number representation."
-
-        return self._target
+        super().__init__(alphabetic, 0, flags)
 
     def _validate(self):
         "Validate that input is a alphabetic number in appropriate writing system."
