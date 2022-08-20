@@ -11,10 +11,10 @@ Omninumeric provides support for number reading and writing in alphabetic numera
 ## Supported numeral systems
 
 - [x] Cyrillic
-- [] Roman - WIP
-- [] Byzantian Greek - WIP
-- [] Modern Greek - planned
-- [] Hebrew - planned
+- [ ] Roman - WIP
+- [ ] Byzantian Greek - WIP
+- [ ] Modern Greek - planned
+- [ ] Hebrew - planned
 
 ## Background
 
@@ -38,7 +38,7 @@ See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
 
 	b = CU.CyrillicNumber("а҃").convert()
 
-"Delimiter" and "plain" style numbers are supported both for reading and writing, 'plain" style is used by default for writing.
+"Delimiter" and "plain" style numbers are supported both for reading and writing, "plain" style is used by default for writing.
 
 When writing into Cyrillic, several falgs can be used:
 
