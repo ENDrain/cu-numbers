@@ -15,12 +15,13 @@ def isinstanceEx(value, cond, msg=""):
 @unique
 class Dictionary(Enum):
     @classmethod
-    def get(cls, input):
+    def get(cls, numeral):
+
         try:
-            return cls[input].value
+            return cls[numeral].value
         except:
             try:
-                return cls(input).name
+                return cls(numeral).name
             except:
                 return None
 

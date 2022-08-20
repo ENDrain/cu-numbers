@@ -91,11 +91,11 @@ class IntNumberConverterGreek(IntNumberConverter):
 
 class StrNumberConverterGreek(StrNumberConverter):
     @classmethod
-    def _calculateMultiplier(cls, index, input):
+    def _calculateMultiplier(cls, index, group):
         "Calculate multiplier for adjusting digit group value to its registry."
 
         multiplier = (
-            re.match("({0}*)".format(cls._dict.get("THOUSAND")), input)
+            re.match("({0}*)".format(cls._dict.get("THOUSAND")), group)
             .groups()[0]
             .count(cls._dict.get("THOUSAND"))
         )  # Count trailing thousand marks in the group
