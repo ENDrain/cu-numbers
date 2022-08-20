@@ -110,23 +110,18 @@ class AlphabeticNumberConverterGreek(AlphabeticNumberConverter):
         # Use thousand marks if present, otherwise use group index
         return multiplier
 
-    @classmethod
-    def _translate(cls, alphabetic):
-
-        total = 0  # Current group total value
-        for k in alphabetic:
-            total += cls._dict.get(k)
-
-        return total
-
     def _translateGroups(self):
         "Translate the alphabetic number per group."
 
         for i, k in enumerate(self._groups):
-
+            total = 0  # Current group total value
             multiplier = self._calculateMultiplier(i, k)
             k = re.sub(self._dict.get("THOUSAND"), "", k)  # Strip thousand marks
-            self._arabic += self._translate(k) * multiplier
+
+            for l in k:
+                total += self._getNumeral(l)
+
+            self._arabic += total * multiplier
 
         return self
 
