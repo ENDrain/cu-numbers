@@ -139,7 +139,7 @@ class StrNumberConverterGreek(StrNumberConverter):
             .groups()[0]
             .count(cls._dict.get("THOUSAND"))
         )  # Count trailing thousand marks in the group
-        multiplier = pow(1000, multiplier if multiplier else index - 1)
+        multiplier = pow(1000, multiplier if multiplier else index)
         # Use thousand marks if present, otherwise use group index
         return multiplier
 

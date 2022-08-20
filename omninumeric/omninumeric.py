@@ -92,11 +92,10 @@ class NumberConverter:
     def _purgeEmptyGroups(self):
         "Remove empty groups from numeral groups collection."
 
-        for i, k in enumerate(self._groups):
-
-            if not k:
-                self._groups.pop(i)  # Purge empty groups
-
+        print(self._groups)
+        while self._groups.count(""):
+            self._groups.remove("")  # Purge empty groups
+        print(self._groups)
         return self
 
     def convert(self):
