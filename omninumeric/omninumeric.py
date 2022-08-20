@@ -5,7 +5,7 @@ import re
 from enum import Enum, unique
 
 
-def isinstance(value, cond, msg):
+def isinstanceEx(value, cond, msg=""):
 
     t = type(value)
     if not t == cond:
@@ -79,7 +79,7 @@ class IntNumberConverter(NumberConverter):
     def _validate(self):
         "Validate that input is a natural Arabic number."
 
-        isinstance(self._source, int, "Integer required, got {0}")
+        isinstanceEx(self._source, int, "Integer required, got {0}")
 
         if self._source <= 0:
             raise ValueError("Natural number required")
@@ -100,7 +100,7 @@ class StrNumberConverter(NumberConverter):
     def _validate(self):
         "Validate that input is a alphabetic number in appropriate writing system."
 
-        isinstance(self._source, str, "String required, got {0}")
+        isinstanceEx(self._source, str, "String required, got {0}")
 
         if not self._source:
             raise ValueError("Non-empty string required")
