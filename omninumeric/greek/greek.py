@@ -66,7 +66,6 @@ class ArabicNumberConverterGreek(ArabicNumberConverter):
 
     @classmethod
     def _getDigit(cls, input):
-        "Get CU digit for given Arabic digit."
 
         return cls._dict.get(input) if input else ""
 
@@ -79,7 +78,7 @@ class ArabicNumberConverterGreek(ArabicNumberConverter):
             index = 0
 
             while k > 0:
-                result = self._getDigit(k % 10 * pow(10, index)) + result
+                result = self._getNumeral(k % 10 * pow(10, index)) + result
                 index = index + 1
                 k = k // 10
 

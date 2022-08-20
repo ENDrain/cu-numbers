@@ -22,7 +22,7 @@ class Dictionary(Enum):
             try:
                 return cls(input).name
             except:
-                return ""
+                return None
 
 
 class NumberConverter:
@@ -40,6 +40,12 @@ class NumberConverter:
 
         return self._flags & flag
         # return False if self._flags & flag == 0 else True
+
+    @classmethod
+    def _getNumeral(cls, numeral, fallback):
+        "Get a numeral or its value from dictionary."
+
+        return cls._dict.get(numeral) or fallback
 
     def _purgeEmptyGroups(self):
         "Remove empty groups from digit group collection."
@@ -76,6 +82,12 @@ class ArabicNumberConverter(NumberConverter):
 
         return self
 
+    @classmethod
+    def _getNumeral(cls, numeral):
+        "Get alphabetical digit for given Arabic digit."
+
+        return super()._getNumeral(numeral, "")
+
 
 class AlphabeticNumberConverter(NumberConverter):
     def __init__(self, alphabetic, flags=0):
@@ -103,3 +115,9 @@ class AlphabeticNumberConverter(NumberConverter):
 
         self._alphabetic = str.lower(str.strip(self._alphabetic))
         return self
+
+    @classmethod
+    def _getNumeral(cls, numeral):
+        "Get alphabetical digit for given Arabic digit."
+
+        return super()._getNumeral(numeral, 0)
