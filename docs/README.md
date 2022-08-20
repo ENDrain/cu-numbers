@@ -1,46 +1,54 @@
-# cu-numbers
+# Omninumeric
 
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/cu-numbers) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/cu-numbers) [![Codecov](https://img.shields.io/codecov/c/github/endrain/cu-numbers)](https://app.codecov.io/gh/endrain/cu-numbers)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/omninumeric) ![PyPI - Wheel](https://img.shields.io/pypi/wheel/omninumeric) [![Codecov](https://img.shields.io/codecov/c/github/endrain/omninumeric)](https://app.codecov.io/gh/endrain/omninumeric)
 
-[![PyPI - License](https://img.shields.io/pypi/l/cu-numbers)](./LICENSE) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![PyPI - License](https://img.shields.io/pypi/l/omninumeric)](./LICENSE) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 🌏 English [Русский](./README.ru.md)
 
-A program for numbers conversion between Arabic and Cyrillic (*further CU*) numeral systems.
+Omninumeric provides support for number reading and writing in alphabetic numeral systems.
+
+## Supported numeral systems
+
+- [x] Cyrillic
+- [ ] Roman - WIP
+- [ ] Byzantian Greek - WIP
+- [ ] Modern Greek - planned
+- [ ] Hebrew - planned
 
 ## Background
 
-See [Introduction](./INTRODUCTION.md) to learn about CU numeral system.
+See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
 
 ## Installation
 
-	pip install cu-numbers
+	pip install omninumeric
 
 ## Usage
 
-	import cunumbers.cunumbers as cu
+	import omninumeric.cyrillic as CU
 
-	#   Convert an Arabic number to CU
+	#   Convert a number into Cyrillic
 	#   Requires non-zero int, returns str
 
-	a = cu.to_cu(1)
+	a = CU.ArabicNumber(1).convert()
 	
-	#   Convert a CU number to Arabic
+	#   Convert a Cyrillic number to Arabic
 	#   Requires non-empty str, returns int
 
-	b = cu.to_arab("а҃")
+	b = CU.CyrillicNumber("а҃").convert()
 
-"Delimiter" and "plain" style numbers are supported in both directions. "Delimeter" style is default for CU-wise conversion.
+"Delimiter" and "plain" style numbers are supported both for reading and writing, "plain" style is used by default for writing.
 
-Several falgs can be used with `to_cu()` method:
+When writing into Cyrillic, several falgs can be used:
 
-	#   CU_PLAIN flag sets conversion to "plain" style
+	#   CU_DELIM flag sets conversion to "delimeter" style
 
-	c = cu.to_cu(111111, CU_PLAIN)
+	c = cu.to_alphabetic(111111, CU_DELIM)
 	
-	#   CU_NOTITLO flag omits "titlo" output
+	#   CU_NOTITLO flag omits "titlo" decorator
 
-	d = cu.to_cu(11000, CU_PLAIN | CU_NOTITLO)
+	d = cu.to_alphabetic(11000, CU_DELIM | CU_NOTITLO)
 
 	#   Following flags control dot styling:
 	#
