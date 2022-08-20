@@ -176,9 +176,6 @@ class CyrillicNumber(StrNumberConverterGreek):
 
         return self
 
-    def _breakIntoGroups(self):
-        return super()._breakIntoGroups(self._regex)
-
     def convert(self):
         """
         Convert a Cyrillic number into Arabic numeral system.
@@ -189,7 +186,7 @@ class CyrillicNumber(StrNumberConverterGreek):
         return (
             self._prepare()
             ._validate()
-            ._breakIntoGroups()
+            ._breakIntoGroups(self._regex)
             ._purgeEmptyGroups()
             ._translateGroups()
             ._build()
