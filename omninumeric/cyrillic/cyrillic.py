@@ -89,12 +89,12 @@ class ArabicNumber(IntNumberConverterGreek):
                     self._dict.get("THOUSAND"), self._dict.get("DOT")
                 ),
                 "\g<1>{0}\g<2>".format(self._dict.get("TITLO")),
-                self._alphabetic,
+                self._target,
             )
-            self._alphabetic = (
+            self._target = (
                 result[0]
                 if result[1] > 0
-                else "{0}{1}".format(self._alphabetic, self._dict.get("TITLO"))
+                else "{0}{1}".format(self._target, self._dict.get("TITLO"))
             )
 
         return self
@@ -111,9 +111,9 @@ class ArabicNumber(IntNumberConverterGreek):
     def _wrapDot(self, cond_a, cond_b):
         "Prepend and/or append dots if appropriate flags are set."
 
-        self._alphabetic = "{0}{1}{2}".format(
+        self._target = "{0}{1}{2}".format(
             self._dict.get("DOT") if cond_a else "",
-            self._alphabetic,
+            self._target,
             self._dict.get("DOT") if cond_b else "",
         )
 
@@ -158,10 +158,10 @@ class CyrillicNumber(StrNumberConverterGreek):
         "Prepare the Cyrillic number for conversion."
 
         super()._prepare()
-        self._alphabetic = re.sub(
+        self._source = re.sub(
             "[{0}\{1}]".format(self._dict.get("TITLO"), self._dict.get("DOT")),
             "",
-            self._alphabetic,
+            self._source,
         )  # Strip ҃decorators
 
         return self
@@ -169,7 +169,7 @@ class CyrillicNumber(StrNumberConverterGreek):
     def _validate(self):
 
         super()._validate()
-        if not re.fullmatch("{0}+".format(self._regex), self._alphabetic):
+        if not re.fullmatch("{0}+".format(self._regex), self._source):
             raise ValueError(
                 "String does not match any pattern for Cyrillic numeral system number"
             )

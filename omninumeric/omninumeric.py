@@ -30,8 +30,8 @@ class NumberConverter:
 
     def __init__(self, flags=0):
 
-        self._arabic = 0
-        self._alphabetic = ""
+        self._source = 0
+        self._target = ""
         self._flags = flags
         self._groups = []
 
@@ -65,19 +65,20 @@ class IntNumberConverter(NumberConverter):
     def __init__(self, value, flags=0):
 
         super().__init__(flags)
-        self._arabic = value
+        self._source = value
+        self._target = ""
 
     def _get(self):
         "Return the alphabetic number representation."
 
-        return self._alphabetic
+        return self._target
 
     def _validate(self):
         "Validate that input is a natural Arabic number."
 
-        isinstance(self._arabic, int, "Integer required, got {0}")
+        isinstance(self._source, int, "Integer required, got {0}")
 
-        if self._arabic <= 0:
+        if self._source <= 0:
             raise ValueError("Natural number required")
 
         return self
@@ -93,19 +94,20 @@ class StrNumberConverter(NumberConverter):
     def __init__(self, alphabetic, flags=0):
 
         super().__init__(flags)
-        self._alphabetic = alphabetic
+        self._source = alphabetic
+        self._target = 0
 
     def _get(self):
         "Return the Arabic number representation."
 
-        return self._arabic
+        return self._target
 
     def _validate(self):
         "Validate that input is a alphabetic number in appropriate writing system."
 
-        isinstance(self._alphabetic, str, "String required, got {0}")
+        isinstance(self._source, str, "String required, got {0}")
 
-        if not self._alphabetic:
+        if not self._source:
             raise ValueError("Non-empty string required")
 
         return self
@@ -113,7 +115,7 @@ class StrNumberConverter(NumberConverter):
     def _prepare(self):
         "Prepare the alphabetic number for conversion."
 
-        self._alphabetic = str.lower(str.strip(self._alphabetic))
+        self._source = str.lower(str.strip(self._source))
         return self
 
     @classmethod

@@ -40,7 +40,7 @@ class IntNumberConverterGreek(IntNumberConverter):
         "Build the CU number from digit groups."
 
         for k in self._groups:
-            self._alphabetic = "{0}{1}".format(k, self._alphabetic)
+            self._target = "{0}{1}".format(k, self._target)
         return self
 
     def _appendThousandMarks(self, cond):
@@ -89,19 +89,19 @@ class IntNumberConverterGreek(IntNumberConverter):
     def _breakIntoGroups(self):
         "Break the Arabic number into groups of 3 digits."
 
-        while self._arabic > 0:
-            self._groups.append(self._arabic % 1000)
-            self._arabic = self._arabic // 1000
+        while self._source > 0:
+            self._groups.append(self._source % 1000)
+            self._source = self._source // 1000
 
         return self
 
 
 class StrNumberConverterGreek(StrNumberConverter):
     def _build(self):
-        "Build the alphabetical number from digit groups."
+        "Build the arabic number from digit groups."
 
         for k in self._groups:
-            self._arabic += k
+            self._target += k
         return self
 
     @classmethod
@@ -135,7 +135,7 @@ class StrNumberConverterGreek(StrNumberConverter):
     def _breakIntoGroups(self, regex=""):
         "Break the Cyrillic number in groups of 1-3 digits."
 
-        self._groups = re.split(regex, self._alphabetic)  # Break into groups
+        self._groups = re.split(regex, self._source)  # Break into groups
         self._groups.reverse()  # Reverse groups (to ascending order)
 
         return self
