@@ -92,12 +92,3 @@ class AlphabeticNumberConverter(NumberConverter):
         "Prepare the alphabetic number for conversion."
 
         self._alphabetic = str.lower(str.strip(self._alphabetic))
-
-    @classmethod
-    def _translate(cls, alphabetic):
-
-        total = 0  # Current group total value
-        for k in alphabetic:
-            total += cls._dict.get(k)
-
-        return total

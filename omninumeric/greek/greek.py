@@ -133,6 +133,15 @@ class AlphabeticNumberConverterGreek(AlphabeticNumberConverter):
         # Use thousand marks if present, otherwise use group index
         return multiplier
 
+    @classmethod
+    def _translate(cls, alphabetic):
+
+        total = 0  # Current group total value
+        for k in alphabetic:
+            total += cls._dict.get(k)
+
+        return total
+
     def _translateGroups(self):
         "Translate the alphabetic number per group."
 
