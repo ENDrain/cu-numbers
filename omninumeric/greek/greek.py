@@ -10,8 +10,8 @@ from omninumeric import (
 )
 
 
-CU_PLAIN = 0x1  # Write in plain style
-CU_DELIM = 0x10  # Read/write in delim style
+PLAIN = 0  # Write in plain style
+DELIM = 0b1  # Read/write in delim style
 
 
 class DictionaryGreek(Dictionary):

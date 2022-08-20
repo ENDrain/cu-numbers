@@ -7,10 +7,12 @@ import re
 from omninumeric.greek import *
 
 
-CU_NOTITLO = 0x100  # DO NOT append titlo
-CU_ENDDOT = 0x1000  # Append dot
-CU_PREDOT = 0x10000  # Prepend dot
-CU_DOT = 0x100000  # Delimeter dots (private, for internal flag checks)
+CU_PLAIN = PLAIN
+CU_DELIM = DELIM
+CU_NOTITLO = 0b10  # DO NOT append titlo
+CU_ENDDOT = 0b100  # Append dot
+CU_PREDOT = 0b1000  # Prepend dot
+CU_DOT = 0b10000  # Delimeter dots (private, for internal flag checks)
 CU_DELIMDOT = CU_DOT | CU_DELIM  # Delimeter dots (forces delim style)
 CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots
 CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots

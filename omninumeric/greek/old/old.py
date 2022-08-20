@@ -59,7 +59,7 @@ class ArabicNumber(ArabicNumberConverterGreek):
             return (
                 self._breakIntoGroups()
                 ._translateGroups()
-                ._appendThousandMarks(self._hasFlag(CU_DELIM))
+                ._appendThousandMarks(self._hasFlag(DELIM))
                 ._purgeEmptyGroups()
                 ._build()
                 ._get()

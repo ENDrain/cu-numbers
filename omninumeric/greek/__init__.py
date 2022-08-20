@@ -1,14 +1,14 @@
 from .greek import (
-    CU_PLAIN,
-    CU_DELIM,
+    PLAIN,
+    DELIM,
     DictionaryGreek,
     ArabicNumberConverterGreek,
     AlphabeticNumberConverterGreek,
 )
 
 __all__ = [
-    "CU_PLAIN",
-    "CU_DELIM",
+    "PLAIN",
+    "DELIM",
     "DictionaryGreek",
     "ArabicNumberConverterGreek",
     "AlphabeticNumberConverterGreek",
