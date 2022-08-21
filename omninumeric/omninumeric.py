@@ -52,34 +52,34 @@ class NumberConverter:
     Derive from this class to define converters into and from alphabetic numeral systems.
     """
 
-    _dict = NotImplemented
+    dict = NotImplemented
 
     def __init__(self, source, target, flags=0):
-        self._source = source
-        self._target = target
-        self._flags = flags
-        self._groups = []
+        self.source = source
+        self.target = target
+        self.flags = flags
+        self.groups = []
 
-    def _hasFlag(self, flag):
+    def hasFlag(self, flag):
         "Check if a flag is set."
 
-        return self._flags & flag
+        return self.flags & flag
         # return False if self._flags & flag == 0 else True
 
-    def _get(self):
+    def get(self):
         "Return the converted number."
 
-        return self._target
+        return self.target
 
-    def _build(self):
+    def build(self):
         "Build the converted number from groups of numerals."
 
-        for k in self._groups:
-            self._target = k + self._target
+        for k in self.groups:
+            self.target = k + self.target
         return self
 
     @classmethod
-    def _getNumeral(cls, numeral, fallback):
+    def getNumeral(cls, numeral, fallback):
         """
         Look a numeral up in dictionary.
 
@@ -87,13 +87,13 @@ class NumberConverter:
         @fallback - value to return if @numeral is not found
         """
 
-        return cls._dict.get(numeral) or fallback
+        return cls.dict.get(numeral) or fallback
 
-    def _purgeEmptyGroups(self):
+    def purgeEmptyGroups(self):
         "Remove empty groups from numeral groups collection."
 
-        while self._groups.count(""):
-            self._groups.remove("")  # Purge empty groups
+        while self.groups.count(""):
+            self.groups.remove("")  # Purge empty groups
         return self
 
     def convert(self):
@@ -110,21 +110,21 @@ class IntNumberConverter(NumberConverter):
     def __init__(self, value, flags=0):
         super().__init__(value, "", flags)
 
-    def _validate(self):
+    def validate(self):
         "Validate that source number is a natural number."
 
-        isinstanceEx(self._source, int, "Integer required, got {0}")
+        isinstanceEx(self.source, int, "Integer required, got {0}")
 
-        if self._source <= 0:
+        if self.source <= 0:
             raise ValueError("Natural number required")
 
         return self
 
     @classmethod
-    def _getNumeral(cls, numeral):
+    def getNumeral(cls, numeral):
         "Get alphabetic digit for given value."
 
-        return super()._getNumeral(numeral, "")
+        return super().getNumeral(numeral, "")
 
 
 class StrNumberConverter(NumberConverter):
@@ -137,24 +137,24 @@ class StrNumberConverter(NumberConverter):
     def __init__(self, alphabetic, flags=0):
         super().__init__(alphabetic, 0, flags)
 
-    def _validate(self):
+    def validate(self):
         "Validate that source number is a non-empty string."
 
-        isinstanceEx(self._source, str, "String required, got {0}")
+        isinstanceEx(self.source, str, "String required, got {0}")
 
-        if not self._source:
+        if not self.source:
             raise ValueError("Non-empty string required")
 
         return self
 
-    def _prepare(self):
+    def prepare(self):
         "Prepare source number for further operations."
 
-        self._source = str.lower(str.strip(self._source))
+        self.source = str.lower(str.strip(self.source))
         return self
 
     @classmethod
-    def _getNumeral(cls, numeral):
+    def getNumeral(cls, numeral):
         "Get value for given alphabetic digit."
 
-        return super()._getNumeral(numeral, 0)
+        return super().getNumeral(numeral, 0)

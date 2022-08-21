@@ -18,7 +18,7 @@ CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots flag
 CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots flag
 
 
-class _CyrillicDictionary(DictionaryGreek):
+class CyrillicDictionary(DictionaryGreek):
     "Cyrillic numerals ditcionary."
 
     а = 1
@@ -56,68 +56,68 @@ class _CyrillicDictionary(DictionaryGreek):
 class ArabicNumber(IntNumberConverterGreek):
     "Number converter into Cyrillic numeral system."
 
-    _dict = _CyrillicDictionary
+    dict = CyrillicDictionary
 
-    def _ambiguityCheck(self, cond, flag):
+    def ambiguityCheck(self, cond, flag):
         if cond:
             try:
-                if (self._groups[0] // 10 % 10 == 1) and (
-                    self._groups[1] // 10 % 10 == 0
+                if (self.groups[0] // 10 % 10 == 1) and (
+                    self.groups[1] // 10 % 10 == 0
                 ):
-                    self._flags = self._flags | flag
+                    self.flags = self.flags | flag
             finally:
                 return self
         else:
             return self
 
-    def _swapDigits(self):
+    def swapDigits(self):
         "Swap digits for values 11-19 (unless separated)."
 
-        for i, k in enumerate(self._groups):
+        for i, k in enumerate(self.groups):
 
-            self._groups[i] = re.sub(
-                "({0})([{1}])".format(self._dict.get(10), self._dict.digits()),
+            self.groups[i] = re.sub(
+                "({0})([{1}])".format(self.dict.get(10), self.dict.digits()),
                 "\g<2>\g<1>",
-                self._groups[i],
+                self.groups[i],
             )
 
         return self
 
-    def _appendTitlo(self, cond):
+    def appendTitlo(self, cond):
         'Apply "titlo" decorator unless appropriate flag is set.'
 
         if not cond:
             result = re.subn(
                 "([\S]+)(?<![{0}\{1}])([\S])$".format(
-                    self._dict.get("THOUSAND"), self._dict.get("DOT")
+                    self.dict.get("THOUSAND"), self.dict.get("DOT")
                 ),
-                "\g<1>{0}\g<2>".format(self._dict.get("TITLO")),
-                self._target,
+                "\g<1>{0}\g<2>".format(self.dict.get("TITLO")),
+                self.target,
             )
-            self._target = (
+            self.target = (
                 result[0]
                 if result[1] > 0
-                else "{0}{1}".format(self._target, self._dict.get("TITLO"))
+                else "{0}{1}".format(self.target, self.dict.get("TITLO"))
             )
 
         return self
 
-    def _delimDots(self, cond):
+    def delimDots(self, cond):
         "Insert dots between numeral groups if appropriate flag is set."
 
         if cond:
-            for i, k in enumerate(self._groups[1:]):
-                self._groups[i + 1] = "{0}{1}".format(k, self._dict.get("DOT"))
+            for i, k in enumerate(self.groups[1:]):
+                self.groups[i + 1] = "{0}{1}".format(k, self.dict.get("DOT"))
 
         return self
 
-    def _wrapDot(self, cond_a, cond_b):
+    def wrapDot(self, cond_a, cond_b):
         "Prepend and/or append a dot if appropriate flags are set."
 
-        self._target = "{0}{1}{2}".format(
-            self._dict.get("DOT") if cond_a else "",
-            self._target,
-            self._dict.get("DOT") if cond_b else "",
+        self.target = "{0}{1}{2}".format(
+            self.dict.get("DOT") if cond_a else "",
+            self.target,
+            self.dict.get("DOT") if cond_b else "",
         )
 
         return self
@@ -130,51 +130,51 @@ class ArabicNumber(IntNumberConverterGreek):
         """
 
         return (
-            self._validate()
-            ._breakIntoGroups()
-            ._ambiguityCheck(self._hasFlag(CU_DELIM), CU_DOT)
-            ._translateGroups()
-            ._appendThousandMarks(self._hasFlag(CU_DELIM))
-            ._purgeEmptyGroups()
-            ._swapDigits()
-            ._delimDots(self._hasFlag(CU_DOT))
-            ._build()
-            ._appendTitlo(self._hasFlag(CU_NOTITLO))
-            ._wrapDot(self._hasFlag(CU_PREDOT), self._hasFlag(CU_ENDDOT))
-            ._get()
+            self.validate()
+            .breakIntoGroups()
+            .ambiguityCheck(self.hasFlag(CU_DELIM), CU_DOT)
+            .translateGroups()
+            .appendThousandMarks(self.hasFlag(CU_DELIM))
+            .purgeEmptyGroups()
+            .swapDigits()
+            .delimDots(self.hasFlag(CU_DOT))
+            .build()
+            .appendTitlo(self.hasFlag(CU_NOTITLO))
+            .wrapDot(self.hasFlag(CU_PREDOT), self.hasFlag(CU_ENDDOT))
+            .get()
         )
 
 
 class CyrillicNumber(StrNumberConverterGreek):
     "Number converter from Cyrillic numeral system."
 
-    _dict = _CyrillicDictionary
+    dict = CyrillicDictionary
 
-    _regex = "({0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?))".format(
-        _dict.get("THOUSAND"),
-        _dict.hundreds(),
-        _dict.tens(2),
-        _dict.digits(),
-        _dict.get(10),
+    regex = "({0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?))".format(
+        dict.get("THOUSAND"),
+        dict.hundreds(),
+        dict.tens(2),
+        dict.digits(),
+        dict.get(10),
     )  # Regular expression for typical Cyrillic numeral system number
 
-    def _prepare(self):
+    def prepare(self):
         "Prepare source number for conversion."
 
-        super()._prepare()
-        self._source = re.sub(
-            "[{0}\{1}]".format(self._dict.get("TITLO"), self._dict.get("DOT")),
+        super().prepare()
+        self.source = re.sub(
+            "[{0}\{1}]".format(self.dict.get("TITLO"), self.dict.get("DOT")),
             "",
-            self._source,
+            self.source,
         )  # Strip ҃decorators
 
         return self
 
-    def _validate(self):
+    def validate(self):
         "Validate that source number is a non-empty string and matches the pattern for Cyrillic numeral system numbers."
 
-        super()._validate()
-        if not re.fullmatch("{0}+".format(self._regex), self._source):
+        super().validate()
+        if not re.fullmatch("{0}+".format(self.regex), self.source):
             raise ValueError(
                 "String does not match any pattern for Cyrillic numeral system numbers"
             )
@@ -189,13 +189,13 @@ class CyrillicNumber(StrNumberConverterGreek):
         """
 
         return (
-            self._prepare()
-            ._validate()
-            ._breakIntoGroups(self._regex)
-            ._purgeEmptyGroups()
-            ._translateGroups()
-            ._build()
-            ._get()
+            self.prepare()
+            .validate()
+            .breakIntoGroups(self.regex)
+            .purgeEmptyGroups()
+            .translateGroups()
+            .build()
+            .get()
         )
 
 

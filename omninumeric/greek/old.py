@@ -16,7 +16,7 @@ from omninumeric import (
 from omninumeric.greek import *
 
 
-class _OldGreekDictionary(DictionaryGreek):
+class OldGreekDictionary(DictionaryGreek):
     "Old Greek numerals dictionary"
 
     α = 1
@@ -55,7 +55,7 @@ class _OldGreekDictionary(DictionaryGreek):
 class ArabicNumber(IntNumberConverterGreek):
     "Number converter into Old Greek numeral system."
 
-    _dict = _OldGreekDictionary
+    dict = OldGreekDictionary
 
     def convert(self):
         """
@@ -64,19 +64,19 @@ class ArabicNumber(IntNumberConverterGreek):
         Requires a non-zero integer.
         """
         return (
-            self._breakIntoGroups()
-            ._translateGroups()
-            ._appendThousandMarks(self._hasFlag(DELIM))
-            ._purgeEmptyGroups()
-            ._build()
-            ._get()
+            self.breakIntoGroups()
+            .translateGroups()
+            .appendThousandMarks(self.hasFlag(DELIM))
+            .purgeEmptyGroups()
+            .build()
+            .get()
         )
 
 
 class OldGreekNumber(StrNumberConverterGreek):
     "Number converter from Old Greek numeral system."
 
-    _dict = _OldGreekDictionary
+    dict = OldGreekDictionary
 
     def convert(self):
         """
@@ -85,10 +85,4 @@ class OldGreekNumber(StrNumberConverterGreek):
         Requires a non-empty string.
         """
 
-        return (
-            self._breakIntoGroups()
-            ._purgeEmptyGroups()
-            ._translateGroups()
-            ._build()
-            ._get()
-        )
+        return self.breakIntoGroups().purgeEmptyGroups().translateGroups().build().get()
