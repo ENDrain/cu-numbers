@@ -2,9 +2,7 @@
 # For licensing information see LICENSE file included with the project.
 "This module provides basic tools for reading and writing numbers in Greek-type alphabetic numeral systems."
 
-import re
-
-import omninumeric
+import re, omninumeric
 
 
 PLAIN = 0  # Write in plain style flag
@@ -99,7 +97,9 @@ class IntConverter(omninumeric.IntConverter):
             index = 0
 
             while k > 0:
-                result = self.getNumeral(k % 10 * pow(10, index)) + result
+                result = "{0}{1}".format(
+                    self.getNumeral(k % 10 * pow(10, index)), result
+                )
                 index = index + 1
                 k = k // 10
 

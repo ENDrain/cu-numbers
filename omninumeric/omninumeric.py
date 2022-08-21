@@ -65,7 +65,6 @@ class NumberConverter:
         "Check if a flag is set."
 
         return self.flags & flag
-        # return False if self._flags & flag == 0 else True
 
     def get(self):
         "Return the converted number."
