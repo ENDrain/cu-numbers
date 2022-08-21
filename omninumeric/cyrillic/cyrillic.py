@@ -64,7 +64,7 @@ class IntConverter(greek.IntConverter):
 
     def ambiguityCheck(self, cond, flag):
         "Force delimeter for ambiguous numbers (i.e. ҂а҃і and ҂а.і҃)."
-        if cond:
+        if self.hasFlag(cond):
             try:
                 if (self.groups[0] // 10 % 10 == 1) and (
                     self.groups[1] // 10 % 10 == 0
@@ -91,7 +91,7 @@ class IntConverter(greek.IntConverter):
     def appendTitlo(self, cond):
         'Apply "titlo" decorator unless appropriate flag is set.'
 
-        if not cond:
+        if not self.hasFlag(cond):
             result = re.subn(
                 "([\S]+)(?<![{0}\{1}])([\S])$".format(
                     self.const.THOUSAND, self.const.DELIMETER
@@ -110,7 +110,7 @@ class IntConverter(greek.IntConverter):
     def delimDots(self, cond):
         "Insert dots between numeral groups if appropriate flag is set."
 
-        if cond:
+        if self.hasFlag(cond):
             for i, k in enumerate(self.groups[1:]):
                 self.groups[i + 1] = "{0}{1}".format(k, self.const.DELIMETER)
 
@@ -120,12 +120,15 @@ class IntConverter(greek.IntConverter):
         "Prepend and/or append a dot if appropriate flags are set."
 
         self.target = "{0}{1}{2}".format(
-            self.const.DELIMETER if cond_a else "",
+            self.const.DELIMETER if self.hasFlag(cond_a) else "",
             self.target,
-            self.const.DELIMETER if cond_b else "",
+            self.const.DELIMETER if self.hasFlag(cond_b) else "",
         )
 
         return self
+
+    def appendThousandMarks(self, cond):
+        return super().appendThousandMarks(self.hasFlag(cond), self.const.THOUSAND)
 
     def convert(self):
         "Convert into Cyrillic numeral system. Uses plain style by default."
@@ -133,15 +136,15 @@ class IntConverter(greek.IntConverter):
         return (
             self.validate()
             .breakIntoGroups()
-            .ambiguityCheck(self.hasFlag(DELIM), DOT)
+            .ambiguityCheck(DELIM, DOT)
             .translateGroups()
-            .appendThousandMarks(self.hasFlag(DELIM))
+            .appendThousandMarks(DELIM)
             .purgeEmptyGroups()
             .swapDigits()
-            .delimDots(self.hasFlag(DOT))
+            .delimDots(DOT)
             .build()
-            .appendTitlo(self.hasFlag(NOTITLO))
-            .wrapDot(self.hasFlag(PREDOT), self.hasFlag(ENDDOT))
+            .appendTitlo(NOTITLO)
+            .wrapDot(PREDOT, ENDDOT)
             .get()
         )
 
@@ -183,13 +186,23 @@ class StrConverter(greek.StrConverter):
 
         return self
 
+    @classmethod
+    def calculateMultiplier(cls, index, group):
+        return super().calculateMultiplier(index, group, cls.const.THOUSAND)
+
+    def breakIntoGroups(self):
+        return super().breakIntoGroups(self.regex)
+
+    def translateGroups(self):
+        return super().translateGroups(self.const.THOUSAND)
+
     def convert(self):
         "Convert from Cyrillic numeral system."
 
         return (
             self.prepare()
             .validate()
-            .breakIntoGroups(self.regex)
+            .breakIntoGroups()
             .purgeEmptyGroups()
             .translateGroups()
             .build()

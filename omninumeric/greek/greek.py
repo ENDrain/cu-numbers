@@ -71,20 +71,20 @@ class IntConverter(omninumeric.IntConverter):
     Derive from this class to define converters into Greek-type alphabetic numeral systems.
     """
 
-    def appendThousandMarks(self, cond):
+    def appendThousandMarks(self, cond, thousand):
         "Append thousand marks according to chosen style (plain or delimeter)."
 
         for i, k in enumerate(self.groups):
 
             if k:
-                if cond:
-                    result = "{0}{1}".format(self.const.THOUSAND * i, k)
+                if self.hasFlag(cond):
+                    result = "{0}{1}".format(thousand * i, k)
 
                 else:
                     result = ""
 
                     for l in k:
-                        result = "{0}{1}{2}".format(result, self.const.THOUSAND * i, l)
+                        result = "{0}{1}{2}".format(result, thousand * i, l)
 
                 self.groups[i] = result
 
@@ -125,25 +125,23 @@ class StrConverter(omninumeric.StrConverter):
     """
 
     @classmethod
-    def calculateMultiplier(cls, index, group):
+    def calculateMultiplier(cls, index, group, thousand):
         'Calculate multiplier for a numerals group, according to group index or "thousand" marks present in the group.'
 
         multiplier = (
-            re.match("({0}*)".format(cls.const.THOUSAND), group)
-            .groups()[0]
-            .count(cls.const.THOUSAND)
+            re.match("({0}*)".format(thousand), group).groups()[0].count(thousand)
         )  # Count trailing thousand marks in the group
         multiplier = pow(1000, multiplier if multiplier else index)
         # Use thousand marks if present, otherwise use group index
         return multiplier
 
-    def translateGroups(self):
+    def translateGroups(self, thousand):
         "Translate groups of numerals one by one."
 
         for i, k in enumerate(self.groups):
             total = 0  # Current group total value
             multiplier = self.calculateMultiplier(i, k)
-            k = re.sub(self.const.THOUSAND, "", k)  # Strip thousand marks
+            k = re.sub(thousand, "", k)  # Strip thousand marks
 
             for l in k:
                 total += self.getNumeral(l)
