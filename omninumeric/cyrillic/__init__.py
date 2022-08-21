@@ -8,15 +8,13 @@ from .cyrillic import (
     CU_ALLDOT,
     ArabicNumber,
     CyrillicNumber,
+    Cyrillic,
     to_cu,
     to_arab,
 )
 
 __all__ = [
-    "ArabicNumber",
-    "CyrillicNumber",
-    "to_cu",
-    "to_arab",
+    "Cyrillic",
     "CU_PLAIN",
     "CU_DELIM",
     "CU_NOTITLO",

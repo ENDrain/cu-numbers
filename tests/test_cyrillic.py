@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import unittest
 from omninumeric.cyrillic import *
+from omninumeric.cyrillic import to_cu, to_arab
 
 
 class ToCUPlainTestCase(unittest.TestCase):

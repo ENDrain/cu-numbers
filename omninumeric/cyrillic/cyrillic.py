@@ -199,13 +199,33 @@ class CyrillicNumber(StrNumberConverterGreek):
         )
 
 
+class Cyrillic:
+    def read(number, flags=0):
+        """
+        Convert from Cyrillic numeral system.
+
+        Requires a non-empty string.
+        """
+
+        return CyrillicNumber(number, flags).convert()
+
+    def write(number, flags=0):
+        """
+        Convert into Cyrillic numeral system. Uses plain style by default.
+
+        Requires a non-zero integer.
+        """
+
+        return ArabicNumber(number, flags).convert()
+
+
 def to_cu(integer, flags=0):
     "Deprecated. Use ArabicNumber().convert() instead."
 
-    return ArabicNumber(integer, flags).convert()
+    return Cyrillic.write(integer, flags)
 
 
 def to_arab(alphabetic, flags=0):
     "Deprecated. Use CyrillicNumber().convert() instead."
 
-    return CyrillicNumber(alphabetic).convert()
+    return Cyrillic.read(alphabetic, flags)
