@@ -66,17 +66,13 @@ class ToCUFlagsTestCase(unittest.TestCase):
         self.assertEqual(write(1001, DELIMDOT), "҂а.а҃")
         self.assertEqual(write(1010, DELIMDOT), "҂а.і҃")
         self.assertEqual(write(11000, DELIMDOT), "҂а҃і")
-        self.assertEqual(
-            write(111111111, DELIMDOT), "҂҂раі.҂раі.ра҃і"
-        )
+        self.assertEqual(write(111111111, DELIMDOT), "҂҂раі.҂раі.ра҃і")
 
     def testToCUAlldot(self):
         self.assertEqual(write(1001, ALLDOT), ".҂а.а҃.")
 
     def testToCUDotscustom(self):
-        self.assertEqual(
-            write(1001, ENDDOT + DELIMDOT), "҂а.а҃."
-        )
+        self.assertEqual(write(1001, ENDDOT + DELIMDOT), "҂а.а҃.")
 
 
 class ToArabDelimTestCase(unittest.TestCase):
