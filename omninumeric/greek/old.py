@@ -6,10 +6,14 @@ This module provides tools for reading and writing numbers in Old Greek numeral 
 WIP
 """
 
-__all__ = ["ArabicNumber", "OldGreekNumber"]
+__all__ = ["PLAIN", "DELIM", "read", "write"]
 
 
 from omninumeric import greek
+
+
+PLAIN = greek.PLAIN
+DELIM = greek.DELIM
 
 
 class Dictionary(greek.Dictionary):
@@ -60,7 +64,7 @@ class IntConverter(greek.IntConverter):
         return (
             self.breakIntoGroups()
             .translateGroups()
-            .appendThousandMarks(self.hasFlag(self.flag.DELIM))
+            .appendThousandMarks(DELIM)
             .purgeEmptyGroups()
             .build()
             .get()
@@ -80,3 +84,13 @@ class StrConverter(greek.StrConverter):
         """
 
         return self.breakIntoGroups().purgeEmptyGroups().translateGroups().build().get()
+
+
+def write(number, flags=0):
+    raise NotImplementedError
+    return IntConverter(number, flags).convert()
+
+
+def read(number, flags=0):
+    raise NotImplementedError
+    return StrConverter(number, flags).convert()
