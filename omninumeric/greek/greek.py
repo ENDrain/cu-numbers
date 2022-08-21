@@ -4,18 +4,14 @@
 
 import re
 
-from omninumeric import (
-    Dictionary,
-    IntNumberConverter,
-    StrNumberConverter,
-)
+import omninumeric
 
 
 PLAIN = 0  # Write in plain style flag
 DELIM = 0b1  # Read/write in delim style flag
 
 
-class DictionaryGreek(Dictionary):
+class Dictionary(omninumeric.Dictionary):
     """
     ABC for Greek-type alphabetic numeral systems ditcionaries.
 
@@ -68,7 +64,7 @@ class DictionaryGreek(Dictionary):
         return cls.getmany(start, end, 100)
 
 
-class IntNumberConverterGreek(IntNumberConverter):
+class IntConverter(omninumeric.IntConverter):
     """
     ABC for number conversion into Greek-type alphabetic numeral systems.
 
@@ -123,7 +119,7 @@ class IntNumberConverterGreek(IntNumberConverter):
         return self
 
 
-class StrNumberConverterGreek(StrNumberConverter):
+class StrConverter(omninumeric.StrConverter):
     """
     ABC for number conversion from Greek-type alphabetic numeral systems.
 

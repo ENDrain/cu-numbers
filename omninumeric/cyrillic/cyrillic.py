@@ -4,11 +4,11 @@
 "This module provides tools for reading and writing numbers in Cyrillic numeral system."
 
 import re
-from omninumeric.greek import *
+from omninumeric import greek
 
 
-CU_PLAIN = PLAIN  # Write in plain style flag
-CU_DELIM = DELIM  # Read/write in delim style flag
+CU_PLAIN = greek.PLAIN  # Write in plain style flag
+CU_DELIM = greek.DELIM  # Read/write in delim style flag
 CU_NOTITLO = 0b10  # DO NOT append titlo flag
 CU_ENDDOT = 0b100  # Append dot flag
 CU_PREDOT = 0b1000  # Prepend dot flag
@@ -18,7 +18,7 @@ CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots flag
 CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots flag
 
 
-class CyrillicDictionary(DictionaryGreek):
+class Dictionary(greek.Dictionary):
     "Cyrillic numerals ditcionary."
 
     а = 1
@@ -53,10 +53,10 @@ class CyrillicDictionary(DictionaryGreek):
     DOT = "."  # Dot decorator
 
 
-class ArabicNumber(IntNumberConverterGreek):
+class IntConverter(greek.IntConverter):
     "Number converter into Cyrillic numeral system."
 
-    dict = CyrillicDictionary
+    dict = Dictionary
 
     def ambiguityCheck(self, cond, flag):
         if cond:
@@ -145,10 +145,10 @@ class ArabicNumber(IntNumberConverterGreek):
         )
 
 
-class CyrillicNumber(StrNumberConverterGreek):
+class StrConverter(greek.StrConverter):
     "Number converter from Cyrillic numeral system."
 
-    dict = CyrillicDictionary
+    dict = Dictionary
 
     regex = "({0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?))".format(
         dict.get("THOUSAND"),
@@ -200,15 +200,6 @@ class CyrillicNumber(StrNumberConverterGreek):
 
 
 class Cyrillic:
-    def read(number, flags=0):
-        """
-        Convert from Cyrillic numeral system.
-
-        Requires a non-empty string.
-        """
-
-        return CyrillicNumber(number, flags).convert()
-
     def write(number, flags=0):
         """
         Convert into Cyrillic numeral system. Uses plain style by default.
@@ -216,7 +207,16 @@ class Cyrillic:
         Requires a non-zero integer.
         """
 
-        return ArabicNumber(number, flags).convert()
+        return IntConverter(number, flags).convert()
+
+    def read(number, flags=0):
+        """
+        Convert from Cyrillic numeral system.
+
+        Requires a non-empty string.
+        """
+
+        return StrConverter(number, flags).convert()
 
 
 def to_cu(integer, flags=0):

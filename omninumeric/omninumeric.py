@@ -100,7 +100,7 @@ class NumberConverter:
         raise NotImplementedError
 
 
-class IntNumberConverter(NumberConverter):
+class IntConverter(NumberConverter):
     """
     ABC for number conversion into alphabetic numeral systems.
 
@@ -127,7 +127,7 @@ class IntNumberConverter(NumberConverter):
         return super().getNumeral(numeral, "")
 
 
-class StrNumberConverter(NumberConverter):
+class StrConverter(NumberConverter):
     """
     ABC for number conversion from alphabetic numeral systems.
 

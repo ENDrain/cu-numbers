@@ -9,14 +9,10 @@ WIP
 __all__ = ["ArabicNumber", "OldGreekNumber"]
 
 
-from omninumeric import (
-    StrNumberConverter,
-    IntNumberConverter,
-)
-from omninumeric.greek import *
+from omninumeric import greek
 
 
-class OldGreekDictionary(DictionaryGreek):
+class Dictionary(greek.Dictionary):
     "Old Greek numerals dictionary"
 
     α = 1
@@ -52,10 +48,10 @@ class OldGreekDictionary(DictionaryGreek):
     DOT = "."  # Dot decorator
 
 
-class ArabicNumber(IntNumberConverterGreek):
+class IntConverter(greek.IntConverter):
     "Number converter into Old Greek numeral system."
 
-    dict = OldGreekDictionary
+    dict = Dictionary
 
     def convert(self):
         """
@@ -73,10 +69,10 @@ class ArabicNumber(IntNumberConverterGreek):
         )
 
 
-class OldGreekNumber(StrNumberConverterGreek):
+class StrConverter(greek.StrConverter):
     "Number converter from Old Greek numeral system."
 
-    dict = OldGreekDictionary
+    dict = Dictionary
 
     def convert(self):
         """
