@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="omninumeric",
-    version="1.0.0",
+    version="2.0.0",
     author="Andrei Shur",
     author_email="amshoor@gmail.com",
     description="Read and write numbers in alphabetic numeral systems",

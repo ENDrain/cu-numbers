@@ -26,36 +26,36 @@ See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
 
 ## Usage
 
-	import omninumeric.cyrillic as CU
+	from omninumeric import cyrillic
 
 	#   Convert a number into Cyrillic
 	#   Requires non-zero int, returns str
 
-	a = CU.ArabicNumber(1).convert()
+	a = cyrillic.write(1)
 	
 	#   Convert a Cyrillic number to Arabic
 	#   Requires non-empty str, returns int
 
-	b = CU.CyrillicNumber("а҃").convert()
+	b = cyrillic.read("а҃")
 
 "Delimiter" and "plain" style numbers are supported both for reading and writing, "plain" style is used by default for writing.
 
 When writing into Cyrillic, several falgs can be used:
 
-	#   CU_DELIM flag sets conversion to "delimeter" style
+	#   DELIM flag sets conversion to "delimeter" style
 
-	c = cu.to_alphabetic(111111, CU_DELIM)
+	c = cyrillic.write(111111, cyrillic.DELIM)
 	
-	#   CU_NOTITLO flag omits "titlo" decorator
+	#   NOTITLO flag omits "titlo" decorator
 
-	d = cu.to_alphabetic(11000, CU_DELIM | CU_NOTITLO)
+	d = cyrillic.write(11000, cyrillic.DELIM | cyrillic.NOTITLO)
 
 	#   Following flags control dot styling:
 	#
-	#   CU_ENDDOT - append dot at the end
-	#   CU_WRAPDOT - append dot at both ends
-	#   CU_DELIMDOT - add dot separator between digit groups. Sets conversion to "delim" style
-	#   CU_ALLDOT - combine CU_WRAPDOT and CU_DELIMDOT
+	#   ENDDOT - append dot at the end
+	#   WRAPDOT - append dot at both ends
+	#   DELIMDOT - add dot separator between digit groups. Sets conversion to "delim" style
+	#   ALLDOT - combine WRAPDOT and DELIMDOT
 
 
 ## Contributing

@@ -9,14 +9,10 @@ WIP
 __all__ = ["ArabicNumber", "OldGreekNumber"]
 
 
-from omninumeric import (
-    StrNumberConverter,
-    IntNumberConverter,
-)
-from omninumeric.greek import *
+from omninumeric import greek
 
 
-class _OldGreekDictionary(DictionaryGreek):
+class Dictionary(greek.Dictionary):
     "Old Greek numerals dictionary"
 
     α = 1
@@ -52,10 +48,8 @@ class _OldGreekDictionary(DictionaryGreek):
     DOT = "."  # Dot decorator
 
 
-class ArabicNumber(IntNumberConverterGreek):
+class IntConverter(greek.IntConverter):
     "Number converter into Old Greek numeral system."
-
-    _dict = _OldGreekDictionary
 
     def convert(self):
         """
@@ -64,19 +58,19 @@ class ArabicNumber(IntNumberConverterGreek):
         Requires a non-zero integer.
         """
         return (
-            self._breakIntoGroups()
-            ._translateGroups()
-            ._appendThousandMarks(self._hasFlag(DELIM))
-            ._purgeEmptyGroups()
-            ._build()
-            ._get()
+            self.breakIntoGroups()
+            .translateGroups()
+            .appendThousandMarks(self.hasFlag(self.flag.DELIM))
+            .purgeEmptyGroups()
+            .build()
+            .get()
         )
 
 
-class OldGreekNumber(StrNumberConverterGreek):
+class StrConverter(greek.StrConverter):
     "Number converter from Old Greek numeral system."
 
-    _dict = _OldGreekDictionary
+    dict = Dictionary
 
     def convert(self):
         """
@@ -85,10 +79,4 @@ class OldGreekNumber(StrNumberConverterGreek):
         Requires a non-empty string.
         """
 
-        return (
-            self._breakIntoGroups()
-            ._purgeEmptyGroups()
-            ._translateGroups()
-            ._build()
-            ._get()
-        )
+        return self.breakIntoGroups().purgeEmptyGroups().translateGroups().build().get()
