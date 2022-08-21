@@ -7,15 +7,15 @@ import re
 from omninumeric import greek
 
 
-CU_PLAIN = greek.PLAIN  # Write in plain style flag
-CU_DELIM = greek.DELIM  # Read/write in delim style flag
-CU_NOTITLO = 0b10  # DO NOT append titlo flag
-CU_ENDDOT = 0b100  # Append dot flag
-CU_PREDOT = 0b1000  # Prepend dot flag
-CU_DOT = 0b10000  # Delimeter dots flag
-CU_DELIMDOT = CU_DOT | CU_DELIM  # Delimeter dots flag (forces delim style)
-CU_WRAPDOT = CU_ENDDOT | CU_PREDOT  # Wrap in dots flag
-CU_ALLDOT = CU_ENDDOT | CU_PREDOT | CU_DELIMDOT  # Wrapper and delimeter dots flag
+PLAIN = greek.PLAIN  # Write in plain style flag
+DELIM = greek.DELIM  # Read/write in delim style flag
+NOTITLO = 0b10  # DO NOT append titlo flag
+ENDDOT = 0b100  # Append dot flag
+PREDOT = 0b1000  # Prepend dot flag
+DOT = 0b10000  # Delimeter dots flag
+DELIMDOT = DOT | DELIM  # Delimeter dots flag (forces delim style)
+WRAPDOT = ENDDOT | PREDOT  # Wrap in dots flag
+ALLDOT = ENDDOT | PREDOT | DELIMDOT  # Wrapper and delimeter dots flag
 
 
 class Dictionary(greek.Dictionary):
@@ -48,17 +48,22 @@ class Dictionary(greek.Dictionary):
     ѱ = 700
     ѿ = 800
     ц = 900
+
+
+class Const:
     THOUSAND = "҂"  # "Thousand" mark
     TITLO = "҃"  # "Titlo" decorator
-    DOT = "."  # Dot decorator
+    DELIMETER = "."  # Dot decorator
 
 
 class IntConverter(greek.IntConverter):
     "Number converter into Cyrillic numeral system."
 
-    dict = Dictionary
+    dict_ = Dictionary
+    const = Const
 
     def ambiguityCheck(self, cond, flag):
+        "Force delimeter for ambiguous numbers (i.e. ҂а҃і and ҂а.і҃)."
         if cond:
             try:
                 if (self.groups[0] // 10 % 10 == 1) and (
@@ -76,7 +81,7 @@ class IntConverter(greek.IntConverter):
         for i, k in enumerate(self.groups):
 
             self.groups[i] = re.sub(
-                "({0})([{1}])".format(self.dict.get(10), self.dict.digits()),
+                "({0})([{1}])".format(self.dict_.get(10), self.dict_.digits()),
                 "\g<2>\g<1>",
                 self.groups[i],
             )
@@ -89,15 +94,15 @@ class IntConverter(greek.IntConverter):
         if not cond:
             result = re.subn(
                 "([\S]+)(?<![{0}\{1}])([\S])$".format(
-                    self.dict.get("THOUSAND"), self.dict.get("DOT")
+                    self.const.THOUSAND, self.const.DELIMETER
                 ),
-                "\g<1>{0}\g<2>".format(self.dict.get("TITLO")),
+                "\g<1>{0}\g<2>".format(self.const.TITLO),
                 self.target,
             )
             self.target = (
                 result[0]
                 if result[1] > 0
-                else "{0}{1}".format(self.target, self.dict.get("TITLO"))
+                else "{0}{1}".format(self.target, self.const.TITLO)
             )
 
         return self
@@ -107,7 +112,7 @@ class IntConverter(greek.IntConverter):
 
         if cond:
             for i, k in enumerate(self.groups[1:]):
-                self.groups[i + 1] = "{0}{1}".format(k, self.dict.get("DOT"))
+                self.groups[i + 1] = "{0}{1}".format(k, self.const.DELIMETER)
 
         return self
 
@@ -115,32 +120,28 @@ class IntConverter(greek.IntConverter):
         "Prepend and/or append a dot if appropriate flags are set."
 
         self.target = "{0}{1}{2}".format(
-            self.dict.get("DOT") if cond_a else "",
+            self.const.DELIMETER if cond_a else "",
             self.target,
-            self.dict.get("DOT") if cond_b else "",
+            self.const.DELIMETER if cond_b else "",
         )
 
         return self
 
     def convert(self):
-        """
-        Convert into Cyrillic numeral system. Uses plain style by default.
-
-        Requires a non-zero integer.
-        """
+        "Convert into Cyrillic numeral system. Uses plain style by default."
 
         return (
             self.validate()
             .breakIntoGroups()
-            .ambiguityCheck(self.hasFlag(CU_DELIM), CU_DOT)
+            .ambiguityCheck(self.hasFlag(DELIM), DOT)
             .translateGroups()
-            .appendThousandMarks(self.hasFlag(CU_DELIM))
+            .appendThousandMarks(self.hasFlag(DELIM))
             .purgeEmptyGroups()
             .swapDigits()
-            .delimDots(self.hasFlag(CU_DOT))
+            .delimDots(self.hasFlag(DOT))
             .build()
-            .appendTitlo(self.hasFlag(CU_NOTITLO))
-            .wrapDot(self.hasFlag(CU_PREDOT), self.hasFlag(CU_ENDDOT))
+            .appendTitlo(self.hasFlag(NOTITLO))
+            .wrapDot(self.hasFlag(PREDOT), self.hasFlag(ENDDOT))
             .get()
         )
 
@@ -148,14 +149,15 @@ class IntConverter(greek.IntConverter):
 class StrConverter(greek.StrConverter):
     "Number converter from Cyrillic numeral system."
 
-    dict = Dictionary
+    dict_ = Dictionary
+    const = Const
 
     regex = "({0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?))".format(
-        dict.get("THOUSAND"),
-        dict.hundreds(),
-        dict.tens(2),
-        dict.digits(),
-        dict.get(10),
+        const.THOUSAND,
+        dict_.hundreds(),
+        dict_.tens(2),
+        dict_.digits(),
+        dict_.get(10),
     )  # Regular expression for typical Cyrillic numeral system number
 
     def prepare(self):
@@ -163,7 +165,7 @@ class StrConverter(greek.StrConverter):
 
         super().prepare()
         self.source = re.sub(
-            "[{0}\{1}]".format(self.dict.get("TITLO"), self.dict.get("DOT")),
+            "[{0}\{1}]".format(self.const.TITLO, self.const.DELIMETER),
             "",
             self.source,
         )  # Strip ҃decorators
@@ -182,11 +184,7 @@ class StrConverter(greek.StrConverter):
         return self
 
     def convert(self):
-        """
-        Convert from Cyrillic numeral system.
-
-        Requires a non-empty string.
-        """
+        "Convert from Cyrillic numeral system."
 
         return (
             self.prepare()
@@ -199,33 +197,21 @@ class StrConverter(greek.StrConverter):
         )
 
 
-class Cyrillic:
-    def write(number, flags=0):
-        """
-        Convert into Cyrillic numeral system. Uses plain style by default.
+def write(number, flags=0):
+    """
+    Convert into Cyrillic numeral system. Uses plain style by default.
 
-        Requires a non-zero integer.
-        """
+    Requires a non-zero integer.
+    """
 
-        return IntConverter(number, flags).convert()
-
-    def read(number, flags=0):
-        """
-        Convert from Cyrillic numeral system.
-
-        Requires a non-empty string.
-        """
-
-        return StrConverter(number, flags).convert()
+    return IntConverter(number, flags).convert()
 
 
-def to_cu(integer, flags=0):
-    "Deprecated. Use ArabicNumber().convert() instead."
+def read(number, flags=0):
+    """
+    Convert from Cyrillic numeral system.
 
-    return Cyrillic.write(integer, flags)
+    Requires a non-empty string.
+    """
 
-
-def to_arab(alphabetic, flags=0):
-    "Deprecated. Use CyrillicNumber().convert() instead."
-
-    return Cyrillic.read(alphabetic, flags)
+    return StrConverter(number, flags).convert()

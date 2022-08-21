@@ -1,140 +1,143 @@
 # -*- coding: UTF-8 -*-
 import unittest
 from omninumeric.cyrillic import *
-from omninumeric.cyrillic import to_cu, to_arab
 
 
 class ToCUPlainTestCase(unittest.TestCase):
     def testToCUDigits(self):
-        self.assertEqual(to_cu(1), "а҃")
-        self.assertEqual(to_cu(9), "ѳ҃")
+        self.assertEqual(write(1), "а҃")
+        self.assertEqual(write(9), "ѳ҃")
 
     def testToCUTens(self):
-        self.assertEqual(to_cu(10), "і҃")
-        self.assertEqual(to_cu(18), "и҃і")
-        self.assertEqual(to_cu(22), "к҃в")
+        self.assertEqual(write(10), "і҃")
+        self.assertEqual(write(18), "и҃і")
+        self.assertEqual(write(22), "к҃в")
 
     def testToCUHundreds(self):
-        self.assertEqual(to_cu(100), "р҃")
-        self.assertEqual(to_cu(207), "с҃з")
-        self.assertEqual(to_cu(333), "тл҃г")
+        self.assertEqual(write(100), "р҃")
+        self.assertEqual(write(207), "с҃з")
+        self.assertEqual(write(333), "тл҃г")
 
     def testToCUThousand(self):
-        self.assertEqual(to_cu(1000), "҂а҃")
-        self.assertEqual(to_cu(1006), "҂а҃ѕ")
-        self.assertEqual(to_cu(1010), "҂а҃і")
-        self.assertEqual(to_cu(1015), "҂ає҃і")
-        self.assertEqual(to_cu(1444), "҂аум҃д")
-        self.assertEqual(to_cu(11000), "҂і҂а҃")
+        self.assertEqual(write(1000), "҂а҃")
+        self.assertEqual(write(1006), "҂а҃ѕ")
+        self.assertEqual(write(1010), "҂а҃і")
+        self.assertEqual(write(1015), "҂ає҃і")
+        self.assertEqual(write(1444), "҂аум҃д")
+        self.assertEqual(write(11000), "҂і҂а҃")
 
     def testToCUBig(self):
-        self.assertEqual(to_cu(10001010001), "҂҂҂і҂҂а҂і҃а")
-        self.assertEqual(to_cu(50000000000), "҂҂҂н҃")
-        self.assertEqual(to_cu(60000070000), "҂҂҂ѯ҂ѻ҃")
-        self.assertEqual(to_cu(111111111), "҂҂р҂҂і҂҂а҂р҂і҂ара҃і")
+        self.assertEqual(write(10001010001), "҂҂҂і҂҂а҂і҃а")
+        self.assertEqual(write(50000000000), "҂҂҂н҃")
+        self.assertEqual(write(60000070000), "҂҂҂ѯ҂ѻ҃")
+        self.assertEqual(write(111111111), "҂҂р҂҂і҂҂а҂р҂і҂ара҃і")
 
 
 class ToCUDelimTestCase(unittest.TestCase):
     def testToCUDelimAmbiguity(self):
-        self.assertEqual(to_cu(1010, CU_DELIM), "҂а.і҃")
-        self.assertEqual(to_cu(11000, CU_DELIM), "҂а҃і")
-        self.assertEqual(to_cu(10010, CU_DELIM), "҂і҃і")
-        self.assertEqual(to_cu(110010, CU_DELIM), "҂рі҃і")
-        self.assertEqual(to_cu(100010, CU_DELIM), "҂р.і҃")
-        self.assertEqual(to_cu(110000, CU_DELIM), "҂р҃і")
-        self.assertEqual(to_cu(100011, CU_DELIM), "҂р.а҃і")
-        self.assertEqual(to_cu(111000, CU_DELIM), "҂ра҃і")
+        self.assertEqual(write(1010, DELIM), "҂а.і҃")
+        self.assertEqual(write(11000, DELIM), "҂а҃і")
+        self.assertEqual(write(10010, DELIM), "҂і҃і")
+        self.assertEqual(write(110010, DELIM), "҂рі҃і")
+        self.assertEqual(write(100010, DELIM), "҂р.і҃")
+        self.assertEqual(write(110000, DELIM), "҂р҃і")
+        self.assertEqual(write(100011, DELIM), "҂р.а҃і")
+        self.assertEqual(write(111000, DELIM), "҂ра҃і")
 
     def testToCUDelimBig(self):
-        self.assertEqual(to_cu(10001010001, CU_DELIM), "҂҂҂і҂҂а҂і҃а")
-        self.assertEqual(to_cu(50000000000, CU_DELIM), "҂҂҂н҃")
-        self.assertEqual(to_cu(60000070000, CU_DELIM), "҂҂҂ѯ҂ѻ҃")
-        self.assertEqual(to_cu(111111111, CU_DELIM), "҂҂раі҂раіра҃і")
+        self.assertEqual(write(10001010001, DELIM), "҂҂҂і҂҂а҂і҃а")
+        self.assertEqual(write(50000000000, DELIM), "҂҂҂н҃")
+        self.assertEqual(write(60000070000, DELIM), "҂҂҂ѯ҂ѻ҃")
+        self.assertEqual(write(111111111, DELIM), "҂҂раі҂раіра҃і")
 
 
 class ToCUFlagsTestCase(unittest.TestCase):
     def testToCUNotitlo(self):
-        self.assertEqual(to_cu(1, CU_NOTITLO), "а")
-        self.assertEqual(to_cu(11000, CU_NOTITLO), "҂і҂а")
+        self.assertEqual(write(1, NOTITLO), "а")
+        self.assertEqual(write(11000, NOTITLO), "҂і҂а")
 
     def testToCUEnddot(self):
-        self.assertEqual(to_cu(1, CU_ENDDOT), "а҃.")
+        self.assertEqual(write(1, ENDDOT), "а҃.")
 
     def testToCUWrapdot(self):
-        self.assertEqual(to_cu(1, CU_WRAPDOT), ".а҃.")
+        self.assertEqual(write(1, WRAPDOT), ".а҃.")
 
     def testToCUDelimdot(self):
-        self.assertEqual(to_cu(1001, CU_DELIMDOT), "҂а.а҃")
-        self.assertEqual(to_cu(1010, CU_DELIMDOT), "҂а.і҃")
-        self.assertEqual(to_cu(11000, CU_DELIMDOT), "҂а҃і")
-        self.assertEqual(to_cu(111111111, CU_DELIMDOT), "҂҂раі.҂раі.ра҃і")
+        self.assertEqual(write(1001, DELIMDOT), "҂а.а҃")
+        self.assertEqual(write(1010, DELIMDOT), "҂а.і҃")
+        self.assertEqual(write(11000, DELIMDOT), "҂а҃і")
+        self.assertEqual(
+            write(111111111, DELIMDOT), "҂҂раі.҂раі.ра҃і"
+        )
 
     def testToCUAlldot(self):
-        self.assertEqual(to_cu(1001, CU_ALLDOT), ".҂а.а҃.")
+        self.assertEqual(write(1001, ALLDOT), ".҂а.а҃.")
 
     def testToCUDotscustom(self):
-        self.assertEqual(to_cu(1001, CU_ENDDOT + CU_DELIMDOT), "҂а.а҃.")
+        self.assertEqual(
+            write(1001, ENDDOT + DELIMDOT), "҂а.а҃."
+        )
 
 
 class ToArabDelimTestCase(unittest.TestCase):
     def testToArabDigits(self):
-        self.assertEqual(1, to_arab("а҃"))
-        self.assertEqual(9, to_arab("ѳ"))
+        self.assertEqual(1, read("а҃"))
+        self.assertEqual(9, read("ѳ"))
 
     def testToArabTens(self):
-        self.assertEqual(10, to_arab("і҃"))
-        self.assertEqual(18, to_arab("и҃і"))
-        self.assertEqual(22, to_arab("к҃в"))
+        self.assertEqual(10, read("і҃"))
+        self.assertEqual(18, read("и҃і"))
+        self.assertEqual(22, read("к҃в"))
 
     def testToArabHundreds(self):
-        self.assertEqual(100, to_arab("р҃"))
-        self.assertEqual(207, to_arab("с҃з"))
-        self.assertEqual(333, to_arab("тл҃г"))
+        self.assertEqual(100, read("р҃"))
+        self.assertEqual(207, read("с҃з"))
+        self.assertEqual(333, read("тл҃г"))
 
     def testToArabThousands(self):
-        self.assertEqual(1000, to_arab("҂а҃"))
-        self.assertEqual(1006, to_arab("҂а҃ѕ"))
-        self.assertEqual(1015, to_arab("҂ає҃і"))
-        self.assertEqual(1444, to_arab("҂аум҃д"))
+        self.assertEqual(1000, read("҂а҃"))
+        self.assertEqual(1006, read("҂а҃ѕ"))
+        self.assertEqual(1015, read("҂ає҃і"))
+        self.assertEqual(1444, read("҂аум҃д"))
 
     def testToArabBig(self):
-        self.assertEqual(10001010001, to_arab("҂҂҂і҂҂а҂і҃а"))
-        self.assertEqual(50000000000, to_arab("҂҂҂н҃"))
-        self.assertEqual(60000070000, to_arab("҂҂҂ѯ҂ѻ҃"))
+        self.assertEqual(10001010001, read("҂҂҂і҂҂а҂і҃а"))
+        self.assertEqual(50000000000, read("҂҂҂н҃"))
+        self.assertEqual(60000070000, read("҂҂҂ѯ҂ѻ҃"))
 
     def testToArabNoTsnd(self):
-        self.assertEqual(80500690700, to_arab("пфхч҃ѱ"))
+        self.assertEqual(80500690700, read("пфхч҃ѱ"))
 
     def testToArabNotitlo(self):
-        self.assertEqual(1, to_arab("а"))
+        self.assertEqual(1, read("а"))
 
     def testToArabSpaced(self):
-        self.assertEqual(1, to_arab("а҃ "))
+        self.assertEqual(1, read("а҃ "))
 
     def testToArabUppercase(self):
-        self.assertEqual(1, to_arab("А҃"))
+        self.assertEqual(1, read("А҃"))
 
     def testToArabMixed(self):
-        self.assertEqual(2021, to_arab(" вКА"))
+        self.assertEqual(2021, read(" вКА"))
 
 
 class ToArabPlainTestCase(unittest.TestCase):
     def testToArabPlainBig(self):
-        self.assertEqual(11000, to_arab("҂і҂а"))
-        self.assertEqual(111111111, to_arab("҂҂р҂҂і҂҂а҂р҂і҂ара҃і"))
+        self.assertEqual(11000, read("҂і҂а"))
+        self.assertEqual(111111111, read("҂҂р҂҂і҂҂а҂р҂і҂ара҃і"))
 
 
 class ErrorTestCase(unittest.TestCase):
     def testToCUError(self):
-        self.assertRaises(TypeError, to_cu, "String")
-        self.assertRaises(TypeError, to_cu, 9.75)
-        self.assertRaises(ValueError, to_cu, 0)
-        self.assertRaises(ValueError, to_cu, -69)
+        self.assertRaises(TypeError, write, "String")
+        self.assertRaises(TypeError, write, 9.75)
+        self.assertRaises(ValueError, write, 0)
+        self.assertRaises(ValueError, write, -69)
 
     def testToArabError(self):
-        self.assertRaises(TypeError, to_arab, 420)
-        self.assertRaises(ValueError, to_arab, "")
-        self.assertRaises(ValueError, to_arab, "A113")
+        self.assertRaises(TypeError, read, 420)
+        self.assertRaises(ValueError, read, "")
+        self.assertRaises(ValueError, read, "A113")
 
 
 if __name__ == "__main__":

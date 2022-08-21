@@ -52,7 +52,8 @@ class NumberConverter:
     Derive from this class to define converters into and from alphabetic numeral systems.
     """
 
-    dict = NotImplemented
+    dict_ = NotImplemented
+    const = NotImplemented
 
     def __init__(self, source, target, flags=0):
         self.source = source
@@ -87,7 +88,7 @@ class NumberConverter:
         @fallback - value to return if @numeral is not found
         """
 
-        return cls.dict.get(numeral) or fallback
+        return cls.dict_.get(numeral) or fallback
 
     def purgeEmptyGroups(self):
         "Remove empty groups from numeral groups collection."
@@ -131,7 +132,7 @@ class StrConverter(NumberConverter):
     """
     ABC for number conversion from alphabetic numeral systems.
 
-    Derive from this class to define converters from ABS.
+    Derive from this class to define converters from alphabetic numeral systems.
     """
 
     def __init__(self, alphabetic, flags=0):

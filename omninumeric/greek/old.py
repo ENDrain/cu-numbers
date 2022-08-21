@@ -51,8 +51,6 @@ class Dictionary(greek.Dictionary):
 class IntConverter(greek.IntConverter):
     "Number converter into Old Greek numeral system."
 
-    dict = Dictionary
-
     def convert(self):
         """
         Convert into Old Greek numeral system. Uses plain style by default.
@@ -62,7 +60,7 @@ class IntConverter(greek.IntConverter):
         return (
             self.breakIntoGroups()
             .translateGroups()
-            .appendThousandMarks(self.hasFlag(DELIM))
+            .appendThousandMarks(self.hasFlag(self.flag.DELIM))
             .purgeEmptyGroups()
             .build()
             .get()
