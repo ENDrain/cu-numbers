@@ -131,5 +131,11 @@ class ReadAdvancedTestCase(unittest.TestCase):
         self.assertEqual(2022, read("MMXXII"))
 
 
+class ReadExtendedTestCase(unittest.TestCase):
+    def testReadExtended(self):
+        self.assertEqual(1900019, read("M̅C̅M̅XIX"))
+        self.assertEqual(1001022, read("M̅MXXII"))
+
+
 if __name__ == "__main__":
     unittest.main()

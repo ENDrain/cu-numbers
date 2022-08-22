@@ -15,16 +15,20 @@ class Dictionary(omninumeric.Dictionary):
     M = 1000
 
 
+class Const:
+    THOUSAND = "̅"
+
+
 def buildRegex():
-    regex_a = "(?:{A}{{vinculum}}?){{quantifier}}"  # I-III, X-XXX, C-CCC, M-MMM
-    regex_b = "(?:{A}{{vinculum}}?)?{B}{{vinculum}}?"  # IV-V, XL-L, CD-D
+    regex_a = "(?:{A}{{vinculum}}){{quantifier}}"  # I-III, X-XXX, C-CCC, M-MMM
+    regex_b = "(?:{A}{{vinculum}})?{B}{{vinculum}}"  # IV-V, XL-L, CD-D
     regex_c = (
-        "{B}{{vinculum}}?(?:{A}{{vinculum}}?){{quantifier}}"  # V-VIII, L-LXXX, D-DCCC
+        "{B}{{vinculum}}(?:{A}{{vinculum}}){{quantifier}}"  # V-VIII, L-LXXX, D-DCCC
     )
-    regex_d = "{A}{{vinculum}}?{C}{{vinculum}}?"  # IX, XC, CM
+    regex_d = "{A}{{vinculum}}{C}{{vinculum}}"  # IX, XC, CM
     group_regex = "({0}|{1}|{2}|{3})".format(regex_a, regex_b, regex_c, regex_d)
 
-    number_regex = "^({0})?{1}?{2}?{3}?$".format(
+    number_regex = "({0})?{1}?{2}?{3}?".format(
         regex_a.format(A="{thousand}"),
         group_regex.format(A="{hundred}", B="{fivehundred}", C="{thousand}"),
         group_regex.format(A="{ten}", B="{fifty}", C="{hundred}"),
@@ -37,16 +41,22 @@ def buildRegex():
         hundred=Dictionary.get(100),
         fivehundred=Dictionary.get(500),
         thousand=Dictionary.get(1000),
-        vinculum=Const.THOUSAND,
-        quantifier="{0,3}",
+        quantifier="{{0,3}}",
+        vinculum="{vinculum}",
     )
 
-    return number_regex
+    return "^{0}{1}$".format(
+        number_regex.format(vinculum=Const.THOUSAND), number_regex.format(vinculum="")
+    )
+
+
+# print(buildRegex())
 
 
 class IntConverter(omninumeric.IntConverter):
 
     dict_ = Dictionary
+    const = Const
 
     def translateGroups(self):
 
@@ -97,6 +107,7 @@ class IntConverter(omninumeric.IntConverter):
 class StrConverter(omninumeric.StrConverter):
 
     dict_ = Dictionary
+    const = Const
     number_regex = buildRegex()
 
     def prepare(self):
@@ -109,13 +120,15 @@ class StrConverter(omninumeric.StrConverter):
         for i, k in enumerate(self.groups):
             total = 0
             last = 1000
+            multiplier = pow(1000, 1 if k.find(self.const.THOUSAND) > -1 else 0)
+            k = re.sub(self.const.THOUSAND, "", k)
 
             for l in k:
                 l = self.dict_.get(l)
                 total = total + l if l > last else total - l
                 last = l
 
-            self.groups[i] = abs(total)
+            self.groups[i] = abs(total) * multiplier
 
         return self
 
