@@ -11,7 +11,7 @@ Omninumeric provides support for number reading and writing in alphabetic numera
 ## Supported numeral systems
 
 - [x] Cyrillic
-- [ ] Roman - WIP
+- [x] Roman - numbers up to 3999
 - [ ] Byzantian Greek - WIP
 - [ ] Modern Greek - planned
 - [ ] Hebrew - planned
@@ -26,21 +26,21 @@ See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
 
 ## Usage
 
-	from omninumeric import cyrillic
-
-	#   Convert a number into Cyrillic
+	#   Convert a number into Roman numeral system
 	#   Requires non-zero int, returns str
+	from omninumeric import roman
 
-	a = cyrillic.write(1)
+	a = roman.write(1)
 	
-	#   Convert a Cyrillic number to Arabic
+	#   Convert a Cyrillic number to Arabic numeral system
 	#   Requires non-empty str, returns int
+	from omninumeric import cyrillic
 
 	b = cyrillic.read("а҃")
 
-"Delimiter" and "plain" style numbers are supported both for reading and writing, "plain" style is used by default for writing.
+For Greek-type numeral systems, "Delimiter" and "plain" style numbers are supported both for reading and writing. "Plain" style is used by default for writing.
 
-When writing into Cyrillic, several falgs can be used:
+For Cyrillic numeral system, several falgs can be used for writing:
 
 	#   DELIM flag sets conversion to "delimeter" style
 
