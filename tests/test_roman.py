@@ -3,6 +3,70 @@ import unittest
 from omninumeric.roman import *
 
 
+class WriteBasicTestCase(unittest.TestCase):
+    def testWriteDigits(self):
+        self.assertEqual(write(1), "I")
+        self.assertEqual(write(2), "II")
+        self.assertEqual(write(3), "III")
+        self.assertEqual(write(4), "IV")
+        self.assertEqual(write(5), "V")
+        self.assertEqual(write(6), "VI")
+        self.assertEqual(write(7), "VII")
+        self.assertEqual(write(8), "VIII")
+        self.assertEqual(write(9), "IX")
+
+    def testWriteTens(self):
+        self.assertEqual(write(10), "X")
+        self.assertEqual(write(20), "XX")
+        self.assertEqual(write(30), "XXX")
+        self.assertEqual(write(40), "XL")
+        self.assertEqual(write(50), "L")
+        self.assertEqual(write(60), "LX")
+        self.assertEqual(write(70), "LXX")
+        self.assertEqual(write(80), "LXXX")
+        self.assertEqual(write(90), "XC")
+
+    def testWriteHundreds(self):
+        self.assertEqual(write(100), "C")
+        self.assertEqual(write(200), "CC")
+        self.assertEqual(write(300), "CCC")
+        self.assertEqual(write(400), "CD")
+        self.assertEqual(write(500), "D")
+        self.assertEqual(write(600), "DC")
+        self.assertEqual(write(700), "DCC")
+        self.assertEqual(write(800), "DCCC")
+        self.assertEqual(write(900), "CM")
+
+    def testWriteThousands(self):
+        self.assertEqual(write(1000), "M")
+        self.assertEqual(write(2000), "MM")
+        self.assertEqual(write(3000), "MMM")
+
+
+class WriteAdvancedTestCase(unittest.TestCase):
+    def testWriteTens(self):
+        self.assertEqual(write(12), "XII")
+        self.assertEqual(write(14), "XIV")
+        self.assertEqual(write(18), "XVIII")
+        self.assertEqual(write(19), "XIX")
+        self.assertEqual(write(33), "XXXIII")
+        self.assertEqual(write(45), "XLV")
+        self.assertEqual(write(56), "LVI")
+        self.assertEqual(write(79), "LXXIX")
+        self.assertEqual(write(97), "XCVII")
+
+    def testWriteHundreds(self):
+        self.assertEqual(write(164), "CLXIV")
+        self.assertEqual(write(222), "CCXXII")
+        self.assertEqual(write(477), "CDLXXVII")
+        self.assertEqual(write(759), "DCCLIX")
+        self.assertEqual(write(999), "CMXCIX")
+
+    def testWriteThousands(self):
+        self.assertEqual(write(1919), "MCMXIX")
+        self.assertEqual(write(2022), "MMXXII")
+
+
 class ReadBasicTestCase(unittest.TestCase):
     def testReadDigits(self):
         self.assertEqual(1, read("I"))
