@@ -46,7 +46,7 @@ class StrConverter(omninumeric.StrConverter):
 
             for l in k:
                 l = self.dict_.get(l)
-                total = total + l if l >= last else total - l
+                total = total + l if l > last else total - l
                 last = l
 
             self.groups[i] = abs(total)
