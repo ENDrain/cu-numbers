@@ -15,6 +15,56 @@ class Dictionary(omninumeric.Dictionary):
     M = 1000
 
 
+class IntConverter(omninumeric.IntConverter):
+
+    dict_ = Dictionary
+
+    def translateGroups(self):
+
+        for i, k in enumerate(self.groups):
+            if k == 0:
+                result = ""
+            elif k < 4:
+                result = self.dict_.get(1 * pow(10, i)) * k
+            elif k < 9:
+                result = self.dict_.get(5 * pow(10, i))
+                diff = k - 5
+                if diff < 0:
+                    result = "{0}{1}".format(
+                        self.dict_.get(1 * pow(10, i)) * abs(diff), result
+                    )
+                elif diff > 0:
+                    result = "{0}{1}".format(
+                        result, self.dict_.get(1 * pow(10, i)) * diff
+                    )
+            else:
+                result = "{0}{1}".format(
+                    self.dict_.get(1 * pow(10, i)), self.dict_.get(1 * pow(10, i + 1))
+                )
+
+            self.groups[i] = result
+
+        return self
+
+    def breakIntoGroups(self):
+
+        while self.source > 0:
+            self.groups.append(self.source % 10)
+            self.source = self.source // 10
+
+        return self
+
+    def convert(self):
+        return (
+            self.validate()
+            .breakIntoGroups()
+            .purgeEmptyGroups()
+            .translateGroups()
+            .build()
+            .get()
+        )
+
+
 class StrConverter(omninumeric.StrConverter):
 
     dict_ = Dictionary
@@ -70,6 +120,11 @@ class StrConverter(omninumeric.StrConverter):
             .build()
             .get()
         )
+
+
+def write(number, flags=0):
+
+    return IntConverter(number, flags).convert()
 
 
 def read(number, flags=0):
