@@ -65,7 +65,6 @@ class NumberConverter:
         "Check if a flag is set."
 
         return self.flags & flag
-        # return False if self._flags & flag == 0 else True
 
     def get(self):
         "Return the converted number."
@@ -151,7 +150,7 @@ class StrConverter(NumberConverter):
     def prepare(self):
         "Prepare source number for further operations."
 
-        self.source = str.lower(str.strip(self.source))
+        self.source = str.strip(self.source)
         return self
 
     @classmethod
