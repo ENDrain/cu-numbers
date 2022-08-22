@@ -150,7 +150,7 @@ class StrConverter(NumberConverter):
     def prepare(self):
         "Prepare source number for further operations."
 
-        self.source = str.lower(str.strip(self.source))
+        self.source = str.strip(self.source)
         return self
 
     @classmethod

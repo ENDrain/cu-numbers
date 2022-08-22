@@ -124,6 +124,12 @@ class StrConverter(omninumeric.StrConverter):
     Derive from this class to define converters from Greek-type alphabetic numeral systems.
     """
 
+    def prepare(self):
+
+        super().prepare()
+        self.source = str.lower(self.source)
+        return self
+
     @classmethod
     def calculateMultiplier(cls, index, group, thousand):
         'Calculate multiplier for a numerals group, according to group index or "thousand" marks present in the group.'
