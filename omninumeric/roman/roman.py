@@ -1,11 +1,10 @@
 # -*- coding: UTF-8 -*-
 # For licensing information see LICENSE file included with the project.
 
-import re
-from omninumeric import Dictionary, AlphabeticNumberConverter
+import re, omninumeric
 
 
-class RomanDictionary(Dictionary):
+class Dictionary(omninumeric.Dictionary):
 
     I = 1
     V = 5
@@ -16,68 +15,68 @@ class RomanDictionary(Dictionary):
     M = 1000
 
 
-class RomanConverter(AlphabeticNumberConverter):
-
-    _dict = RomanDictionary
-
+class Const:
     regex_a = "{0}{{0,3}}"
     regex_b = "{0}?{1}"
     regex_c = "{1}{0}{{0,3}}"
     regex_d = "{0}{2}"
     group_regex = "({0}|{1}|{2}|{3})".format(regex_a, regex_b, regex_c, regex_d)
     number_regex = "({0})?{1}?{2}?{3}?".format(
-        regex_a.format(_dict.get(1000)),
-        group_regex.format(_dict.get(100), _dict.get(500), _dict.get(1000)),
-        group_regex.format(_dict.get(10), _dict.get(50), _dict.get(100)),
-        group_regex.format(_dict.get(1), _dict.get(5), _dict.get(10)),
+        regex_a.format(Dictionary.get(1000)),
+        group_regex.format(
+            Dictionary.get(100), Dictionary.get(500), Dictionary.get(1000)
+        ),
+        group_regex.format(Dictionary.get(10), Dictionary.get(50), Dictionary.get(100)),
+        group_regex.format(Dictionary.get(1), Dictionary.get(5), Dictionary.get(10)),
     )
 
-    print(number_regex)
 
-    def _translate(cls, alphabetic):
+class StrConverter(omninumeric.StrConverter):
 
-        total = last = 0
+    dict = Dictionary
+    const = Const
 
-        for k in alphabetic:
+    def translateGroups(self):
 
-            k = cls._dict.get(k)
-            total = total + k if k <= last else total - k
-            last = k
+        for i, k in enumerate(self.groups):
 
-        return abs(total)
+            total = last = 0
 
-    def _translateGroups(self):
+            for l in k:
 
-        for i, k in enumerate(self._groups):
-            self._arabic += self._translate(k)
+                l = cls.dict_.get(k)
+                total = total + l if l <= last else total - l
+                last = l
 
-    def _breakIntoGroups(self):
+            self.groups[i] = total
 
-        self._groups = re.split(
-            self.group_regex.format(
+    def breakIntoGroups(self):
+
+        self.groups = re.split(
+            self.const.group_regex.format(
                 "(?:{0}|{1}|{2}|{3})".format(
-                    self._dict.get(1),
-                    self._dict.get(10),
-                    self._dict.get(100),
-                    self._dict.get(1000),
+                    self.dict_.get(1),
+                    self.dict_.get(10),
+                    self.dict_.get(100),
+                    self.dict_.get(1000),
                 ),
                 "[{0}{1}{2}]".format(
-                    self._dict.get(5), self._dict.get(50), self._dict.get(500)
+                    self.dict_.get(5), self.dict_.get(50), self.dict_.get(500)
                 ),
                 "[{0}{1}{2}]".format(
-                    self._dict.get(10), self._dict.get(100), self._dict.get(1000)
+                    self.dict_.get(10), self.dict_.get(100), self.dict_.get(1000)
                 ),
             ),
-            self._alphabetic,
+            self.source,
         )
 
-        for i, k in enumerate(self._groups):
-            self._groups.pop(i) if not k else True  # Purge empty groups
+        for i, k in enumerate(self.groups):
+            self.groups.pop(i) if not k else True  # Purge empty groups
 
-        print(self._groups)
+        print(self.groups)
 
         return self
 
     def convert(self):
 
-        return self._prepare()._validate()._breakIntoGroups()._translateGroups()._get()
+        return self.prepare().validate().breakIntoGroups().translateGroups().get()
