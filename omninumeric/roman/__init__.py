@@ -1,3 +1,3 @@
-from .roman import RomanConverter
+from .roman import *
 
-__all__ = ["RomanConverter"]
+__all__ = ["read"]

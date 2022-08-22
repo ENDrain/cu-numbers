@@ -15,13 +15,16 @@ class Dictionary(omninumeric.Dictionary):
     M = 1000
 
 
-class Const:
+class StrConverter(omninumeric.StrConverter):
+
+    dict_ = Dictionary
+
     regex_a = "{0}{{0,3}}"
     regex_b = "{0}?{1}"
     regex_c = "{1}{0}{{0,3}}"
     regex_d = "{0}{2}"
     group_regex = "({0}|{1}|{2}|{3})".format(regex_a, regex_b, regex_c, regex_d)
-    number_regex = "({0})?{1}?{2}?{3}?".format(
+    number_regex = "^({0})?{1}?{2}?{3}?$".format(
         regex_a.format(Dictionary.get(1000)),
         group_regex.format(
             Dictionary.get(100), Dictionary.get(500), Dictionary.get(1000)
@@ -30,53 +33,45 @@ class Const:
         group_regex.format(Dictionary.get(1), Dictionary.get(5), Dictionary.get(10)),
     )
 
-
-class StrConverter(omninumeric.StrConverter):
-
-    dict = Dictionary
-    const = Const
+    def prepare(self):
+        super().prepare()
+        self.source = str.upper(self.source)
+        return self
 
     def translateGroups(self):
 
         for i, k in enumerate(self.groups):
-
-            total = last = 0
+            total = 0
+            last = 1000
 
             for l in k:
-
-                l = cls.dict_.get(k)
-                total = total + l if l <= last else total - l
+                l = self.dict_.get(l)
+                total = total + l if l >= last else total - l
                 last = l
 
-            self.groups[i] = total
+            self.groups[i] = abs(total)
+
+        return self
 
     def breakIntoGroups(self):
 
-        self.groups = re.split(
-            self.const.group_regex.format(
-                "(?:{0}|{1}|{2}|{3})".format(
-                    self.dict_.get(1),
-                    self.dict_.get(10),
-                    self.dict_.get(100),
-                    self.dict_.get(1000),
-                ),
-                "[{0}{1}{2}]".format(
-                    self.dict_.get(5), self.dict_.get(50), self.dict_.get(500)
-                ),
-                "[{0}{1}{2}]".format(
-                    self.dict_.get(10), self.dict_.get(100), self.dict_.get(1000)
-                ),
-            ),
-            self.source,
-        )
-
-        for i, k in enumerate(self.groups):
-            self.groups.pop(i) if not k else True  # Purge empty groups
-
-        print(self.groups)
-
+        # print(self.source)
+        self.groups = list(re.fullmatch(self.number_regex, self.source).groups())
         return self
 
     def convert(self):
 
-        return self.prepare().validate().breakIntoGroups().translateGroups().get()
+        return (
+            self.prepare()
+            .validate()
+            .breakIntoGroups()
+            .purgeEmptyGroups()
+            .translateGroups()
+            .build()
+            .get()
+        )
+
+
+def read(number, flags=0):
+
+    return StrConverter(number, flags).convert()
