@@ -15,6 +15,35 @@ class Dictionary(omninumeric.Dictionary):
     M = 1000
 
 
+def buildRegex():
+    regex_a = "(?:{A}{{vinculum}}?){{quantifier}}"  # I-III, X-XXX, C-CCC, M-MMM
+    regex_b = "(?:{A}{{vinculum}}?)?{B}{{vinculum}}?"  # IV-V, XL-L, CD-D
+    regex_c = (
+        "{B}{{vinculum}}?(?:{A}{{vinculum}}?){{quantifier}}"  # V-VIII, L-LXXX, D-DCCC
+    )
+    regex_d = "{A}{{vinculum}}?{C}{{vinculum}}?"  # IX, XC, CM
+    group_regex = "({0}|{1}|{2}|{3})".format(regex_a, regex_b, regex_c, regex_d)
+
+    number_regex = "^({0})?{1}?{2}?{3}?$".format(
+        regex_a.format(A="{thousand}"),
+        group_regex.format(A="{hundred}", B="{fivehundred}", C="{thousand}"),
+        group_regex.format(A="{ten}", B="{fifty}", C="{hundred}"),
+        group_regex.format(A="{one}", B="{five}", C="{ten}"),
+    ).format(
+        one=Dictionary.get(1),
+        five=Dictionary.get(5),
+        ten=Dictionary.get(10),
+        fifty=Dictionary.get(50),
+        hundred=Dictionary.get(100),
+        fivehundred=Dictionary.get(500),
+        thousand=Dictionary.get(1000),
+        vinculum=Const.THOUSAND,
+        quantifier="{0,3}",
+    )
+
+    return number_regex
+
+
 class IntConverter(omninumeric.IntConverter):
 
     dict_ = Dictionary
@@ -68,20 +97,7 @@ class IntConverter(omninumeric.IntConverter):
 class StrConverter(omninumeric.StrConverter):
 
     dict_ = Dictionary
-
-    regex_a = "{0}{{0,3}}"
-    regex_b = "{0}?{1}"
-    regex_c = "{1}{0}{{0,3}}"
-    regex_d = "{0}{2}"
-    group_regex = "({0}|{1}|{2}|{3})".format(regex_a, regex_b, regex_c, regex_d)
-    number_regex = "^({0})?{1}?{2}?{3}?$".format(
-        regex_a.format(Dictionary.get(1000)),
-        group_regex.format(
-            Dictionary.get(100), Dictionary.get(500), Dictionary.get(1000)
-        ),
-        group_regex.format(Dictionary.get(10), Dictionary.get(50), Dictionary.get(100)),
-        group_regex.format(Dictionary.get(1), Dictionary.get(5), Dictionary.get(10)),
-    )
+    number_regex = buildRegex()
 
     def prepare(self):
         super().prepare()
