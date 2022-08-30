@@ -78,8 +78,7 @@ class IntConverter(greek.IntConverter):
     def swapDigits(self):
         "Swap digits for values 11-19 (unless separated)."
 
-        for i, k in enumerate(self.groups):
-
+        for i in range(len(self.groups)):
             self.groups[i] = re.sub(
                 "({0})([{1}])".format(self.dict_.get(10), self.dict_.digits()),
                 "\g<2>\g<1>",

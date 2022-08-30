@@ -73,7 +73,6 @@ class IntConverter(omninumeric.IntConverter):
         "Append thousand marks according to chosen style (plain or delimeter)."
 
         for i, k in enumerate(self.groups):
-
             if k:
                 if self.hasFlag(cond):
                     result = "{0}{1}".format(thousand * i, k)
@@ -92,15 +91,14 @@ class IntConverter(omninumeric.IntConverter):
         "Translate groups of numerals one by one."
 
         for i, k in enumerate(self.groups):
-
             result = ""
-            index = 0
+            registry = 0
 
             while k > 0:
                 result = "{0}{1}".format(
-                    self.getNumeral(k % 10 * pow(10, index)), result
+                    self.getNumeral(k % 10 * pow(10, registry)), result
                 )
-                index = index + 1
+                registry = registry + 1
                 k = k // 10
 
             self.groups[i] = result

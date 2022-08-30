@@ -113,10 +113,10 @@ class IntConverter(NumberConverter):
     def validate(self):
         "Validate that source number is a natural number."
 
-        isinstanceEx(self.source, int, "Integer required, got {0}")
+        isinstanceEx(self.source, int, "Integer required, got {0}.")
 
         if self.source <= 0:
-            raise ValueError("Natural number required")
+            raise ValueError("Natural number required.")
 
         return self
 
@@ -140,10 +140,10 @@ class StrConverter(NumberConverter):
     def validate(self):
         "Validate that source number is a non-empty string."
 
-        isinstanceEx(self.source, str, "String required, got {0}")
+        isinstanceEx(self.source, str, "String required, got {0}.")
 
         if not self.source:
-            raise ValueError("Non-empty string required")
+            raise ValueError("Non-empty string required.")
 
         return self
 
