@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# For licensing information see LICENSE file included with the project.
+# For licensing information see LICENSE file included in the project's root directory.
 "This module provides basic tools for reading and writing numbers in alphabetic numeral systems."
 
 import re

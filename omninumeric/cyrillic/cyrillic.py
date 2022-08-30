@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-# For licensing information see LICENSE file included with the project.
+# For licensing information see LICENSE file included in the project's root directory.
 # To learn about Cyrillic numeral system (CU), see INTRODUCTION.md
 "This module provides tools for reading and writing numbers in Cyrillic numeral system."
 
