@@ -46,10 +46,13 @@ class Dictionary(greek.Dictionary):
     ψ = 700
     ω = 800
     ϡ = 900
+
+
+class Const:
     THOUSAND = "͵"  # "Thousand" mark
     KERAIA = "ʹ"  # "Keraia" decorator
     OVERLINE = "̅"  # Overline decorator
-    DOT = "."  # Dot decorator
+    DELIMETER = "."  # Dot decorator
 
 
 class IntConverter(greek.IntConverter):
