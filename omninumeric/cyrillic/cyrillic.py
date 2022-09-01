@@ -70,8 +70,8 @@ REGEX = "(\{6}?{0}*[{1}]?(?:(?:{0}*[{3}]{5}?)?{4}|(?:{0}*[{2}]{5}?)?(?:{0}*[{3}]
 class IntConverter(greek.IntConverter):
     "Number converter into Cyrillic numeral system."
 
-    dict_ = Dictionary
-    const = Const
+    def __init__(self, source, flags):
+        super().__init__(source, flags, Dictionary, Const())
 
     def ambiguityCheck(self, cond, flag):
         "Force delimeter for ambiguous numbers (i.e. ҂а҃і and ҂а.і҃)."
@@ -161,8 +161,8 @@ class IntConverter(greek.IntConverter):
 class StrConverter(greek.StrConverter):
     "Number converter from Cyrillic numeral system."
 
-    dict_ = Dictionary
-    const = Const
+    def __init__(self, source, flags):
+        super().__init__(source, flags, Dictionary, Const())
 
     def prepare(self):
         "Prepare source number for conversion."
@@ -176,9 +176,8 @@ class StrConverter(greek.StrConverter):
 
         return self
 
-    @classmethod
-    def calculateMultiplier(cls, index, group):
-        return super().calculateMultiplier(index, group, cls.const.THOUSAND)
+    def calculateMultiplier(self, index, group):
+        return super().calculateMultiplier(index, group, self.const.THOUSAND)
 
     def breakIntoGroups(self):
         return super().breakIntoGroups(REGEX)

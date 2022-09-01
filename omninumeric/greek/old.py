@@ -58,6 +58,9 @@ class Const:
 class IntConverter(greek.IntConverter):
     "Number converter into Old Greek numeral system."
 
+    def __init__(self, source, flags):
+        super().__init__(source, flags, Dictionary(), Const())
+
     def convert(self):
         """
         Convert into Old Greek numeral system. Uses plain style by default.
@@ -77,7 +80,8 @@ class IntConverter(greek.IntConverter):
 class StrConverter(greek.StrConverter):
     "Number converter from Old Greek numeral system."
 
-    dict = Dictionary
+    def __init__(self, source, flags):
+        super().__init__(source, flags, Dictionary, Const())
 
     def convert(self):
         """

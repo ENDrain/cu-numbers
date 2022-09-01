@@ -54,9 +54,8 @@ REGEX = buildRegex()
 
 
 class IntConverter(omninumeric.IntConverter):
-
-    dict_ = Dictionary
-    const = Const
+    def __init__(self, source, flags):
+        super().__init__(source, flags, Dictionary, Const())
 
     def translateGroups(self):
 
@@ -98,9 +97,8 @@ class IntConverter(omninumeric.IntConverter):
 
 
 class StrConverter(omninumeric.StrConverter):
-
-    dict_ = Dictionary
-    const = Const
+    def __init__(self, source, flags):
+        super().__init__(source, flags, Dictionary, Const())
 
     def prepare(self):
         super().prepare()

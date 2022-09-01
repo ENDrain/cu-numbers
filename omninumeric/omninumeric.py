@@ -38,13 +38,12 @@ class NumberConverter:
     Derive from this class to define converters into and from alphabetic numeral systems.
     """
 
-    dict_ = NotImplemented
-    const = NotImplemented
-
-    def __init__(self, source, target, flags=0):
+    def __init__(self, source, flags, target, dict_, const):
         self.source = source
-        self.target = target
         self.flags = flags
+        self.target = target
+        self.dict_ = dict_
+        self.const = const
         self.groups = []
 
     def hasFlag(self, flag):
@@ -64,8 +63,7 @@ class NumberConverter:
             self.target = k + self.target
         return self
 
-    @classmethod
-    def getNumeral(cls, numeral, fallback):
+    def getNumeral(self, numeral, fallback):
         """
         Look a numeral up in dictionary.
 
@@ -73,7 +71,7 @@ class NumberConverter:
         @fallback - value to return if @numeral is not found
         """
 
-        return cls.dict_.get(numeral) or fallback
+        return self.dict_.get(numeral) or fallback
 
     def purgeEmptyGroups(self):
         "Remove empty groups from numeral groups collection."
@@ -93,11 +91,10 @@ class IntConverter(NumberConverter):
     Derive from this class to define converters into alphabetic numeral systems.
     """
 
-    def __init__(self, value, flags=0):
-        super().__init__(value, "", flags)
+    def __init__(self, source, flags, dict_, const=None):
+        super().__init__(source, flags, "", dict_, const)
 
-    @classmethod
-    def getNumeral(cls, numeral):
+    def getNumeral(self, numeral):
         "Get alphabetic digit for given value."
 
         return super().getNumeral(numeral, "")
@@ -110,8 +107,8 @@ class StrConverter(NumberConverter):
     Derive from this class to define converters from alphabetic numeral systems.
     """
 
-    def __init__(self, alphabetic, flags=0):
-        super().__init__(alphabetic, 0, flags)
+    def __init__(self, source, flags, dict_, const=None):
+        super().__init__(source, flags, 0, dict_, const)
 
     def prepare(self):
         "Prepare source number for further operations."
@@ -119,8 +116,7 @@ class StrConverter(NumberConverter):
         self.source = str.strip(self.source)
         return self
 
-    @classmethod
-    def getNumeral(cls, numeral):
+    def getNumeral(self, numeral):
         "Get value for given alphabetic digit."
 
         return super().getNumeral(numeral, 0)
