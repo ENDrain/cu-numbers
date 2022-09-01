@@ -94,14 +94,7 @@ class IntConverter(omninumeric.IntConverter):
         return self
 
     def convert(self):
-        return (
-            self.validate()
-            .breakIntoGroups()
-            .purgeEmptyGroups()
-            .translateGroups()
-            .build()
-            .get()
-        )
+        return self.breakIntoGroups().purgeEmptyGroups().translateGroups().build().get()
 
 
 class StrConverter(omninumeric.StrConverter):
@@ -142,7 +135,6 @@ class StrConverter(omninumeric.StrConverter):
 
         return (
             self.prepare()
-            .validate()
             .breakIntoGroups()
             .purgeEmptyGroups()
             .translateGroups()

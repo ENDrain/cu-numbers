@@ -133,8 +133,7 @@ class IntConverter(greek.IntConverter):
         "Convert into Cyrillic numeral system. Uses plain style by default."
 
         return (
-            self.validate()
-            .breakIntoGroups()
+            self.breakIntoGroups()
             .ambiguityCheck(DELIM, DOT)
             .translateGroups()
             .appendThousandMarks(DELIM)
@@ -174,17 +173,6 @@ class StrConverter(greek.StrConverter):
 
         return self
 
-    def validate(self):
-        "Validate that source number is a non-empty string and matches the pattern for Cyrillic numeral system numbers."
-
-        super().validate()
-        if not re.fullmatch("{0}+".format(self.regex), self.source):
-            raise ValueError(
-                "String does not match any pattern for Cyrillic numeral system numbers"
-            )
-
-        return self
-
     @classmethod
     def calculateMultiplier(cls, index, group):
         return super().calculateMultiplier(index, group, cls.const.THOUSAND)
@@ -200,7 +188,6 @@ class StrConverter(greek.StrConverter):
 
         return (
             self.prepare()
-            .validate()
             .breakIntoGroups()
             .purgeEmptyGroups()
             .translateGroups()

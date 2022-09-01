@@ -126,14 +126,14 @@ class ReadPlainTestCase(unittest.TestCase):
 class ErrorTestCase(unittest.TestCase):
     def testWriteError(self):
         self.assertRaises(TypeError, write, "String")
-        self.assertRaises(TypeError, write, 9.75)
-        self.assertRaises(ValueError, write, 0)
-        self.assertRaises(ValueError, write, -69)
+        self.assertEqual(write(9.75), "҃")
+        self.assertEqual(write(0), "҃")
+        self.assertEqual(write(-69), "҃")
 
     def testReadError(self):
         self.assertRaises(TypeError, read, 420)
-        self.assertRaises(ValueError, read, "")
-        self.assertRaises(ValueError, read, "A113")
+        self.assertEqual(0, read(""))
+        self.assertEqual(0, read("A113"))
 
 
 if __name__ == "__main__":

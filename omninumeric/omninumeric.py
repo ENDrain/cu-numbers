@@ -6,20 +6,6 @@ import re
 from enum import Enum, unique
 
 
-def isinstanceEx(value, cond, msg=""):
-    """
-    Test if value is of a speciic type, raise error with specified message if not.
-
-    @value - value to test
-    @cond - type to test against
-    @msg - error message to print. Supports format() to print @value type
-    """
-
-    t = type(value)
-    if not t == cond:
-        raise TypeError(msg.format(t))
-
-
 @unique
 class Dictionary(Enum):
     """
@@ -110,16 +96,6 @@ class IntConverter(NumberConverter):
     def __init__(self, value, flags=0):
         super().__init__(value, "", flags)
 
-    def validate(self):
-        "Validate that source number is a natural number."
-
-        isinstanceEx(self.source, int, "Integer required, got {0}.")
-
-        if self.source <= 0:
-            raise ValueError("Natural number required.")
-
-        return self
-
     @classmethod
     def getNumeral(cls, numeral):
         "Get alphabetic digit for given value."
@@ -136,16 +112,6 @@ class StrConverter(NumberConverter):
 
     def __init__(self, alphabetic, flags=0):
         super().__init__(alphabetic, 0, flags)
-
-    def validate(self):
-        "Validate that source number is a non-empty string."
-
-        isinstanceEx(self.source, str, "String required, got {0}.")
-
-        if not self.source:
-            raise ValueError("Non-empty string required.")
-
-        return self
 
     def prepare(self):
         "Prepare source number for further operations."
