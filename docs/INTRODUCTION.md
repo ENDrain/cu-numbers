@@ -17,17 +17,17 @@ Cyrillic|Arabic|Cyrillic|Arabic|Cyrillic|Arabic
 и҃|8|п҃|80|ѿ҃|800
 ѳ҃|9|ч҃|90|ц҃|900
 
-## 2. Basic numbers
-A number `x < 1000` is represented by appropriate Cyrillic registry numerals in descending registry order, except for numbers 11-19, where numerals are swapped.
+## 2. "Basic" numbers
+A number `x < 1000` is represented by appropriate Cyrillic registry numerals in descending registry order, except for numbers 11-19 where numerals are swapped.
 
 **Examples:**
 Cyrillic|Arabic|Cyrillic|Arabic|Cyrillic|Arabic
 ---|---|---|---|---|---
-а҃|1|і҃|10|р҃|100
+|||||р҃|100
 |||||р҃а|101
-|||||р҃і|110
+|||і҃|10|р҃і|110
 |||а҃і|11|ра҃і|111
-|||к҃а|21|рк҃а|121
+а҃|1|к҃а|21|рк҃а|121
 
 ## 3. Numbers from thousand and above
 In a number `x > 999`, the `҂` "thousand" sign is used before numerals that represent higher order of magnitude. For each thousand sign before a numeral its value is multiplied by 1000.
@@ -54,14 +54,14 @@ Cyrillic|Arabic
 ҂р҂і҂ара҃і|111 111
 
 ## 4.2 "Delimeter" style
-In "delimeter" style, "thousand" signs are prepended to each group of numerals that form a basic number, so that the whole basic number following is multiplied.
+In "delimeter" style, "thousand" signs are prepended to each group of numerals that form a "basic" number, so that the whole basic number following is multiplied.
 
 Unlike in "plain", in this style numerals representing numbers 11-19 are swapped on each occurrence.
 
 **Examples:**
 Cyrillic|Arabic
 ---|---
-҂раіра҃і|111 111
+҂҂раі҂раіра҃і|111 111 111
 
 ## 4.3 "Circled" style
 In "circled" style, a special set of encircling markers is used to denote each higher order of magnitude from ten thousands up to billions.
