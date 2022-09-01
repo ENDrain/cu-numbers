@@ -10,6 +10,7 @@ __all__ = [
     "DELIMDOT",
     "WRAPDOT",
     "ALLDOT",
+    "REGEX",
     "read",
     "write",
 ]

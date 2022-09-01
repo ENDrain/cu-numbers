@@ -50,7 +50,7 @@ def buildRegex():
     )
 
 
-# print(buildRegex())
+REGEX = buildRegex()
 
 
 class IntConverter(omninumeric.IntConverter):
@@ -101,7 +101,6 @@ class StrConverter(omninumeric.StrConverter):
 
     dict_ = Dictionary
     const = Const
-    number_regex = buildRegex()
 
     def prepare(self):
         super().prepare()
@@ -128,7 +127,7 @@ class StrConverter(omninumeric.StrConverter):
     def breakIntoGroups(self):
 
         # print(self.source)
-        self.groups = list(re.fullmatch(self.number_regex, self.source).groups())
+        self.groups = list(re.fullmatch(REGEX, self.source).groups())
         return self
 
     def convert(self):

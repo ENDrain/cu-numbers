@@ -137,5 +137,11 @@ class ReadExtendedTestCase(unittest.TestCase):
         self.assertEqual(1001022, read("M̅MXXII"))
 
 
+class RegexTestCase(unittest.TestCase):
+    def testRegex(self):
+        self.assertRegex("CDLXXVII", REGEX)
+        self.assertNotRegex("IVI", REGEX)
+
+
 if __name__ == "__main__":
     unittest.main()

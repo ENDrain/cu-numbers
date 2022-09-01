@@ -56,6 +56,17 @@ class Const:
     DELIMETER = "."  # Dot decorator
 
 
+REGEX = "(\{6}?{0}*[{1}]?(?:(?:{0}*[{3}]{5}?)?{4}|(?:{0}*[{2}]{5}?)?(?:{0}*[{3}])?){5}?\{6}?)".format(
+    Const.THOUSAND,  # 0
+    Dictionary.hundreds(),  # 1
+    Dictionary.tens(2),  # 2
+    Dictionary.digits(),  # 3
+    Dictionary.get(10),  # 4
+    Const.TITLO,  # 5
+    Const.DELIMETER,
+)  # Regular expression for typical Cyrillic numeral system number
+
+
 class IntConverter(greek.IntConverter):
     "Number converter into Cyrillic numeral system."
 
@@ -153,14 +164,6 @@ class StrConverter(greek.StrConverter):
     dict_ = Dictionary
     const = Const
 
-    regex = "({0}*[{1}]?(?:(?:{0}*[{3}])?{4}|(?:{0}*[{2}])?(?:{0}*[{3}])?))".format(
-        const.THOUSAND,
-        dict_.hundreds(),
-        dict_.tens(2),
-        dict_.digits(),
-        dict_.get(10),
-    )  # Regular expression for typical Cyrillic numeral system number
-
     def prepare(self):
         "Prepare source number for conversion."
 
@@ -178,7 +181,7 @@ class StrConverter(greek.StrConverter):
         return super().calculateMultiplier(index, group, cls.const.THOUSAND)
 
     def breakIntoGroups(self):
-        return super().breakIntoGroups(self.regex)
+        return super().breakIntoGroups(REGEX)
 
     def translateGroups(self):
         return super().translateGroups(self.const.THOUSAND)

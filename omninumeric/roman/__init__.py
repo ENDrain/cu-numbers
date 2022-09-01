@@ -1,3 +1,3 @@
 from .roman import *
 
-__all__ = ["write", "read"]
+__all__ = ["REGEX", "write", "read"]

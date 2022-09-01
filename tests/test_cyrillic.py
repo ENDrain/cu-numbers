@@ -136,5 +136,11 @@ class ErrorTestCase(unittest.TestCase):
         self.assertEqual(0, read("A113"))
 
 
+class RegexTestCase(unittest.TestCase):
+    def testRegex(self):
+        self.assertRegex("҂ара҃і", "^{0}+$".format(REGEX))
+        self.assertNotRegex("і҂рꙗ҂а", "^{0}+$".format(REGEX))
+
+
 if __name__ == "__main__":
     unittest.main()
