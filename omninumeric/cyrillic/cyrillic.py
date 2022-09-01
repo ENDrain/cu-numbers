@@ -106,7 +106,7 @@ class IntConverter(greek.IntConverter):
 
         return self
 
-    def delimDots(self, cond):
+    def delimDot(self, cond):
         "Insert dots between numeral groups if appropriate flag is set."
 
         if self.hasFlag(cond):
@@ -140,7 +140,7 @@ class IntConverter(greek.IntConverter):
             .appendThousandMarks(DELIM)
             .purgeEmptyGroups()
             .swapDigits()
-            .delimDots(DOT)
+            .delimDot(DOT)
             .build()
             .appendTitlo(NOTITLO)
             .wrapDot(PREDOT, ENDDOT)
@@ -170,7 +170,7 @@ class StrConverter(greek.StrConverter):
             "[{0}\{1}]".format(self.const.TITLO, self.const.DELIMETER),
             "",
             self.source,
-        )  # Strip ҃decorators
+        )  # Strip decorators
 
         return self
 
