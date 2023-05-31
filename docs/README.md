@@ -26,37 +26,40 @@ See [Introduction](./INTRODUCTION.md) to learn about Cyrillic numeral system.
 
 ## Usage
 
-	#   Convert a number into Roman numeral system
-	#   Requires non-zero int, returns str
-	from omninumeric import roman
+```py
+#   Convert a number into Roman numeral system
+#   Requires non-zero int, returns str
+from omninumeric import roman
 
-	a = roman.write(1)
-	
-	#   Convert a Cyrillic number to Arabic numeral system
-	#   Requires non-empty str, returns int
-	from omninumeric import cyrillic
+a = roman.write(1)
 
-	b = cyrillic.read("а҃")
+#   Convert a Cyrillic number to Arabic numeral system
+#   Requires non-empty str, returns int
+from omninumeric import cyrillic
+
+b = cyrillic.read("а҃")
+```
 
 For Greek-type numeral systems, "Delimiter" and "plain" style numbers are supported both for reading and writing. "Plain" style is used by default for writing.
 
 For Cyrillic numeral system, several falgs can be used for writing:
 
-	#   DELIM flag sets conversion to "delimeter" style
+```py
+#   DELIM flag sets conversion to "delimeter" style
 
-	c = cyrillic.write(111111, cyrillic.DELIM)
-	
-	#   NOTITLO flag omits "titlo" decorator
+c = cyrillic.write(111111, cyrillic.DELIM)
 
-	d = cyrillic.write(11000, cyrillic.DELIM | cyrillic.NOTITLO)
+#   NOTITLO flag omits "titlo" decorator
 
-	#   Following flags control dot styling:
-	#
-	#   ENDDOT - append dot at the end
-	#   WRAPDOT - append dot at both ends
-	#   DELIMDOT - add dot separator between digit groups. Sets conversion to "delim" style
-	#   ALLDOT - combine WRAPDOT and DELIMDOT
+d = cyrillic.write(11000, cyrillic.DELIM | cyrillic.NOTITLO)
 
+#   Following flags control dot styling:
+#
+#   ENDDOT - append dot at the end
+#   WRAPDOT - append dot at both ends
+#   DELIMDOT - add dot separator between digit groups. Sets conversion to "delim" style
+#   ALLDOT - combine WRAPDOT and DELIMDOT
+```
 
 ## Contributing
 
